@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+</head>
+<body>
+	<script type="text/javascript" src="{{ url_for('static', filename='admin_dashboard.js') }}"></script>
+	<div class="w3-panel">
+	<form class="form-horizontal">
+	<legend>Add Question</legend>
+		<div class="form-group">
+			<label for="question" class="col-lg-2 control-label">Question</label>
+			<div class="col-lg-10">
+				<input type="text" class="form-control" id="question" placeholder="Question">
+			</div>
+		</div>
+	<legend>Answer Options</legend>
+		<div class="form-group">
+			<label for="optionSelect" class="col-lg-2 control-label">Number of options:</label>
+			<div class="col-lg-10" id="optionSelect">
+				<select class="form-control" id="numOptions"  onchange="addOptions()">
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+				</select>
+			</div>
+		</div>
+	</form>
+	</div>
+</body>

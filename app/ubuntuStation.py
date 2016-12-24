@@ -72,6 +72,10 @@ def display():
     db=get_db()
     return render_template('survey_mode.html')
     
+@app.route('/admin-dashboard')
+def admin():
+    db=get_db()
+    return render_template('admin_dashboard.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
