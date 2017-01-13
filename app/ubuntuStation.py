@@ -77,6 +77,23 @@ def admin():
     db=get_db()
     return render_template('admin_dashboard.html')
 
+@app.route('/admin-dashboard', methods=['POST'])
+def admin_post():
+    db=get_db()
+    numOptions=request.form['numOptions']
+    question=request.form['question']
+    cur=db.execute('insert into question (questiontext) values (?)', [question])
+    db.commit()
+    questionid=cur.lastrowid
+    for i in range(int(numOptions)):
+        cur=db.execute('insert into option (optiontext, questionid) values (?, ?)', (request.form['option['+str(i)+']'], questionid))
+        db.commit()
+    result = db.execute('select question.questiontext, option.optiontext from question join option on question.questionid=option.questionid order by question.questiontext')
+    entries=result.fetchall()
+    questions=[dict(questiontext=row[0], optiontext=row[1]) for row in entries]
+    db.close()
+    return render_template('show_questions.html', questions=questions)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
