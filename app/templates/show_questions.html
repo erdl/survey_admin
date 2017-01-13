@@ -9,11 +9,13 @@ table, th, td {
 	<table style="width:100%">
 	<tr>
 		<th>Question Text</th>
+		<th>Question URL</th>
 		<th>Option Text</th>
 	</tr>
 	{% for question in questions %}
 		<tr>
 			<td>{{ question.questiontext }}</td>
+			<td>{{ question.questionurl }}</td>
 			<td>{{ question.optiontext }}</td>
 		</tr>
 	{% endfor %}
