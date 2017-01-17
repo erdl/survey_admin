@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
@@ -53,7 +52,7 @@ def close_db(error):
 @app.route('/')
 def show_entries():
     db = get_db()
-    cur = db.execute('SELECT * FROM questions limit 100')
+    cur = db.execute('SELECT * FROM question limit 100')
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
@@ -72,7 +71,7 @@ def add_entry():
 def display():
     db=get_db()
     return render_template('survey_mode.html')
-    
+
 @app.route('/admin-dashboard')
 def admin():
     db=get_db()
