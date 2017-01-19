@@ -2,7 +2,7 @@ drop table if exists question;
 create table question (
 	questionid 	integer primary key autoincrement,
 	questiontext 	text not null,
-	questionurl	text not null
+	questionurl	text not null unique
 );
 
 drop table if exists response;

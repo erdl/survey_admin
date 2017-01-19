@@ -3,6 +3,7 @@ import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash
+from wtforms import Form, StringField, validators
 import time
 
 #create the application
@@ -72,6 +73,10 @@ def display():
     db=get_db()
     return render_template('survey_mode.html')
 
+@app.route('/admin-landing')
+def admin_landing():
+    return render_template('admin_landing.html')
+
 @app.route('/admin-dashboard')
 def admin():
     db=get_db()
@@ -79,22 +84,22 @@ def admin():
 
 @app.route('/admin-dashboard', methods=['POST'])
 def admin_post():
-    querytime=time.time()
     db=get_db()
     numOptions=request.form['numOptions']
     question=request.form['question']
     questionurl=request.form['questionurl']
-    cur=db.execute('insert into question (questiontext, questionurl) values (?, ?)', [question, questionurl])
-    db.commit()
-    questionid=cur.lastrowid
-    for i in range(int(numOptions)):
-        cur=db.execute('insert into option (optiontext, questionid) values (?, ?)', (request.form['option['+str(i)+']'], questionid))
+    try:
+        cur=db.execute('insert into question (questiontext, questionurl) values (?, ?)', [question, questionurl])
         db.commit()
+        questionid=cur.lastrowid
+        for i in range(int(numOptions)):
+            cur=db.execute('insert into option (optiontext, questionid) values (?, ?)', (request.form['option['+str(i)+']'], questionid))
+            db.commit()
+    except sqlite3.IntegrityError:
+        print('Integrity Error')
     result = db.execute('select question.questiontext, question.questionurl, option.optiontext from question join option on question.questionid=option.questionid order by question.questiontext')
     entries=result.fetchall()
     questions=[dict(questiontext=row[0], questionurl=row[1], optiontext=row[2]) for row in entries]
-    db.close()
-    print('runtime=', time.time()-querytime)
     return render_template('show_questions.html', questions=questions)
 
 @app.route('/login', methods=['GET', 'POST'])

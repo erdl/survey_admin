@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
+<body>
+	<div class="container">
+	<div class="jumbotron">
+		<h1>FROG Building Survey Dashboard</h1>
+		<p>This is the administrator dashboard for the survey station in the FROG buildings. Administrators can add, edit and delete survey questions as well as select an active question which is what FROG occupants will see.</p>
+		<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Add a new question">Add Question</button>
+		<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Edit or delete existing questions">Manage Questions</button>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+	<script>
+		$(function () {
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+	</script>
+</body>
