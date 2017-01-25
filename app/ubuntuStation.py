@@ -77,7 +77,7 @@ def display():
 def admin_landing():
     return render_template('admin_landing.html')
 
-@app.route('/admin-dashboard')
+@app.route('/admin-dashboard', methods=['GET'])
 def admin():
     db=get_db()
     return render_template('admin_dashboard.html')
@@ -95,12 +95,22 @@ def admin_post():
         for i in range(int(numOptions)):
             cur=db.execute('insert into option (optiontext, questionid) values (?, ?)', (request.form['option['+str(i)+']'], questionid))
             db.commit()
-    except sqlite3.IntegrityError:
-        print('Integrity Error')
-    result = db.execute('select question.questiontext, question.questionurl, option.optiontext from question join option on question.questionid=option.questionid order by question.questiontext')
+        result = db.execute('select question.questiontext, question.questionurl, option.optiontext from question join option on question.questionid=option.questionid order by question.questiontext')
+        entries=result.fetchall()
+        questions=[dict(questiontext=row[0], questionurl=row[1], optiontext=row[2]) for row in entries]
+        return render_template('show_questions.html', questions=questions)
+    except sqlite3.IntegrityError as e:
+        print(str(e))
+        error = str(e)
+        return render_template('error_page.html', error=error)
+
+@app.route('/management', methods=['GET'])
+def management():
+    db=get_db()
+    result=db.execute('select question.questiontext, question.questionurl from question order by question.questiontext')
     entries=result.fetchall()
-    questions=[dict(questiontext=row[0], questionurl=row[1], optiontext=row[2]) for row in entries]
-    return render_template('show_questions.html', questions=questions)
+    questions=[dict(questiontext=row[0], questionurl=row[1]) for row in entries]
+    return render_template('manage_questions.html', questions=questions)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

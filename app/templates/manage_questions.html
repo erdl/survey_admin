@@ -8,14 +8,12 @@
 			<tr>
 				<th>Question</th>
 				<th>Question URL</th>
-				<th>Options</th>
 			</tr>
 		</thead>
 	{% for question in questions %}
 		<tr>
 			<td>{{ question.questiontext }}</td>
 			<td>{{ question.questionurl }}</td>
-			<td>{{ question.optiontext }}</td>
 		</tr>
 	{% endfor %}
 	</table>

@@ -21,3 +21,16 @@ function addOptions() {
 		optionHeader.appendChild(input);
 	}
 }
+
+function validateForm() {
+	alert('validating form2');
+	var inputs=document.forms["questionForm"].getElementsByTagName('input');
+	var i, name;
+	for (i=0; i<inputs.length; i++) {
+		console.log(inputs[i].value);
+		if (inputs[i].value.length == 0) {
+			name=inputs[i].value;
+			document.getElementsByName(name).setAttribute("id", "inputError");
+		}
+	}
+}

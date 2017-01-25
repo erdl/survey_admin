@@ -24,6 +24,12 @@ create table option (
 	FOREIGN KEY(questionid) REFERENCES question(questionid)
 );
 	
-
+drop table if exists activequestion;
+create table activequestion (
+	activequestionid	integer primary key autoincrement,
+	activequestionurl	text not null unique,
+	FOREIGN KEY(questionid) REFERENCES question(questionid)
+);
+	
 
 	 
