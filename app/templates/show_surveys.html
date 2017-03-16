@@ -6,14 +6,12 @@
 	<table class="table table-striped table-hover">
 		<thead>
 			<tr>
-				<th>Question Description</th>
-				<th>Question Text</th>
+				<th>Survey Name</th>
 			</tr>
 		</thead>
-	{% for question in questions %}
+	{% for s in surveys %}
 		<tr>
-			<td><a href="{{ url_for('question_page', questionid=question.question_id) }}">{{ question.question_description }}</a></td>
-			<td>{{ question.question_text }}</td>
+			<td><a href="{{ url_for('survey_page', surveyid=s.survey_info_id) }}">{{ s.survey_name }}</a></td>
 		</tr>
 	{% endfor %}
 	</table>

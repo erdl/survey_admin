@@ -1,0 +1,21 @@
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
+<body>
+	<div class="container">
+	<table class="table table-striped table-hover">
+		<thead>
+			<tr>
+				<th>Active Question URL</th>
+				<th>Question on Display</th>
+			</tr>
+		</thead>
+	{% for question in activequestions %}
+		<tr>
+			<td><a href="{{ url_for('device_page', activequestionid=question.activequestionid) }}">{{ question.activequestionurl }}</a></td>
+			<td>{{ question.questiontext }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	</div>
+</body>

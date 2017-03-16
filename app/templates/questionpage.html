@@ -1,0 +1,18 @@
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
+<body
+	<div class="container">
+		<h1>{{ question.question_description }}</h1>
+		<h1>Question Text</h1>
+		<p>{{ question.question_text }}</p>
+		<h1>Options</h1>
+			<ul>	
+				{% for o in option %}
+				<li>{{ o.text }}</li>
+				{% endfor %}
+			</ul>
+		<h1>Active on these URLs</h1>
+		<p>This question is active on the following URLs<p>
+	</div>
+</body>

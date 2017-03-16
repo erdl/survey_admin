@@ -1,0 +1,35 @@
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
+<body
+	<div class="container">
+		<h1>Survey Name</h1>
+		<p>{{ survey.survey_name }}</p>
+		<p>Kiosk View?
+		{% if survey.kiosk %}
+		<input type="checkbox" id="kioskCheck" disabled="disabled" checked>		
+		{% else %}
+		<input type="checkbox" id="kioskCheck" disabled="disabled">	
+		{% endif %}
+		</p>
+
+		{% if survey.kiosk %}	
+		<h2>Description</h2>
+		<p>{{ survey.description }}</p>
+		{% endif %}
+
+		<h1>Questions</h1>
+			<ul>
+				{% for question in questions %}
+				<li>{{ question.question_description }} <p class="text-muted">{{ question.question_text }}</p></li>
+				{% endfor %}	
+			</ul>
+		<h1>Active On These Devices</h1>
+		<p>This deployment is active on the following devices OR no devices<p>
+	</div>
+<script>
+function disableBox() {
+	document.getElementById("kioskCheck").disabled=true;
+}
+</script>
+</body>

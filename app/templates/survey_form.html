@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="well">
+{% from "_formhelpers.html" import render_field %}
+{{ form.csrf_token }}
+<h1>Survey Form</h1>
+<p class="text-muted">Use this form to add a survey with information and link questions to a survey</p>
+<div class="container">
+<form action="/surveyform" method="post" name="survey_form">
+	{{ form.hidden_tag() }}
+	<div class="form-group">
+		{{ render_field(form.surveyname) }}
+	</div>
+	<div class="form-group" style="width:100%">
+		{{ render_field(form.description) }}	
+	</div>
+	<div class="form-group">
+		{{ render_field(form.question) }}
+	</div>
+	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
+	</fieldset>
+</form>
+</div>
+</div>
+{% endblock %}

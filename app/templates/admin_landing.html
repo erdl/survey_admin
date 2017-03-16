@@ -8,9 +8,11 @@
 	<div class="container" style="padding-top: 15px">
 	<div class="jumbotron">
 		<h1>FROG Building Survey Dashboard</h1>
-		<p>This is the administrator dashboard for the survey station in the FROG buildings. Administrators can add, edit and delete survey questions as well as select an active question which is what FROG occupants will see.</p>
-		<a href="{{ url_for('admin') }}"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Add a new question">Add Question</button></a>
-		<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Edit or delete existing questions">Manage Questions</button>
+		<p>This is the administrator dashboard for the survey station in the FROG buildings. Administrators can view questions and add and manage deployments. Please consult with database manager to add questions and view responses.</p>
+		<a href="{{ url_for('show_questions') }}"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="See questions">View Questions</button></a>
+		<a href="{{ url_for('show_surveys') }}"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="See surveys that are currently available">View Surveys</button></a>
+		<a href="{{ url_for('survey_form') }}"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Add a survey">Create Survey</button></a>
+		<a href="{{ url_for('deployment_form') }}"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Add a deployment">Create Deployment</button></a>
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

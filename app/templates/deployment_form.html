@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="well">
+{% from "_formhelpers.html" import render_field %}
+{{ form.csrf_token }}
+<h1>Deployment Form</h1>
+<p class="text-muted">Use this form to add a deployment</p>
+<div class="container">
+<form action="/deploymentform" method="post" name="deployment_form">
+	{{ form.hidden_tag() }}
+	<div class="form-group">
+		{{ render_field(form.url_text) }}
+	</div>
+	<div class="form-group">
+		{{ render_field(form.building_id) }}	
+	</div>
+	<div class="form-group">
+		{{ render_field(form.is_kiosk) }}
+	</div>
+	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
+	</fieldset>
+</form>
+</div>
+</div>
+{% endblock %}
