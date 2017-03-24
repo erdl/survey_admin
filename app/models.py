@@ -41,7 +41,7 @@ class SurveyInfo(db.Model):
     survey_name=db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
-        return '<deployment name %r>' % (self.deployment_name)
+        return '<survey name %r>' % (self.survey_name)
 
     def __init__(self, description, surveyname):
         self.description=description
@@ -75,9 +75,23 @@ class DeployedURL(db.Model):
     def __init__(self, url, kiosk, building):
         self.url_text = url
         self.is_kioski = kiosk
-        self.buidling_id = building
+        self.building_id = building
+
+    def __repr__(self):
+        return '<deployment url id %r %r %r>' %(self.url_text, self.is_kioski, self.building_id)
 
 class Building(db.Model):
     __tablename__="building"
     building_id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     name=db.Column(db.String(45))
+
+class KioskSurvey(db.Model):
+    __tablename__="kiosk_survey"
+    url=db.Column(db.String(45), nullable=False, primary_key=True)
+    survey_info_id=db.Column(db.Integer, nullable=False)
+    deployed_url_id=db.Column(db.Integer, nullable=False)
+    
+    def __init__(self, url, survey_id, deployed_url_id):
+        self.url=url
+        self.survey_info_id=survey_id
+        self.deployed_url_id=deployed_url_id

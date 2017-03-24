@@ -1,10 +1,7 @@
-<head>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
-</head>
-<body
+{% extends "base.html" %}
+{% block content %}
 	<div class="container">
-		<h1>Survey Name</h1>
-		<p>{{ survey.survey_name }}</p>
+		<h1>Survey: {{ survey.survey_name }}</h1>
 		<p>Kiosk View?
 		{% if survey.kiosk %}
 		<input type="checkbox" id="kioskCheck" disabled="disabled" checked>		
@@ -13,7 +10,7 @@
 		{% endif %}
 		</p>
 
-		{% if survey.kiosk %}	
+		{% if survey.description %}	
 		<h2>Description</h2>
 		<p>{{ survey.description }}</p>
 		{% endif %}
@@ -24,12 +21,21 @@
 				<li>{{ question.question_description }} <p class="text-muted">{{ question.question_text }}</p></li>
 				{% endfor %}	
 			</ul>
-		<h1>Active On These Devices</h1>
-		<p>This deployment is active on the following devices OR no devices<p>
+		<h1>Active On These URLs</h1>
+		{% if hasData %}
+		<p>This deployment is active on the following URLs<p>
+			<ul>
+				{% for d in deployments %}
+				<li>{{ d.url }}</li>
+				{% endfor %}
+			</ul>
+		{% else %}
+		<p class="text-muted">This survey is not currently active on any URLs. To deploy it to an exisiting URL, go to <a href={{ url_for('show_deployments') }}>Manage Deployments</a>. To deploy it to a new URL, go to <a href={{ url_for('deployment_form') }}>Create Deployment</a>.
+		{% endif %}
 	</div>
 <script>
 function disableBox() {
 	document.getElementById("kioskCheck").disabled=true;
 }
 </script>
-</body>
+{% endblock %}

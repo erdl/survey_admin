@@ -1,7 +1,5 @@
-<head>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
-</head>
-<body
+{% extends "base.html" %}
+{% block content %}
 	<div class="container">
 		<h1>{{ question.question_description }}</h1>
 		<h1>Question Text</h1>
@@ -15,4 +13,4 @@
 		<h1>Active on these URLs</h1>
 		<p>This question is active on the following URLs<p>
 	</div>
-</body>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<head>	
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
+<body>
+	<div class="container">
+		<h1>{{ deployment.url_text }} <a href="{{ url_for('edit_deployment_form', deploymentid=deployment.deployed_url_id) }}" class="btn btn-warning"><i class="glyphicon glyphicon-edit"></i> Edit</a></h1>
+		<p>Deployed in
+		<span class="text-muted">{{ building.name }}</span>
+		</p>
+		<p>Kiosk view
+		{% if deployment.is_kioski %}
+		<span class="text-success"> enabled</span>
+		{% else %}
+		<span class="text-muted"> disabled</span>
+		{% endif %}
+		</p>
+		<p>Survey currently being shown: <a href="{{ url_for('survey_page', surveyid=survey.survey_info_id) }}">{{ survey.survey_name }}</a></p>
+	</div>
+</body>
+{% endblock %}
