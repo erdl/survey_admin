@@ -10,22 +10,23 @@
 	<fieldset>
 	{{ form.hidden_tag() }}
 	<div class="form-group">
-		<label for="URL" class="col-lg-2 control-label">URL: {{ ks.url }}</label>
-		<label for="Building" class="col-lg-2 control-label">Building: {{ b.name }}</label>
-		<label for="URL" class="col-lg-2 control-label">
-		Kiosk View?
+		<p><b>URL:</b> {{ ks.url }}</p>
+		<p><b>Building:</b> {{ b.name }}</p>
+		<p>
+		<b>Kiosk View?</b>
 		{% if d.is_kioski %}
 		 Yes
 		{% else %}
 		 No
 		{% endif %}
-		</label>	
+		</p>	
 	</div> 
 	<div class="form-group">
 		{{ render_field(form.survey_id) }}
 	</div>
+
+	<a href="{{ url_for('deployment_page', deployedurlid=did) }}" class="btn btn-default">Cancel</a>
 	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
-	<a href="#"><button type=cancel class="btn btn-danger">Cancel</button></a>
 	</fieldset>
 </form>
 </div>
