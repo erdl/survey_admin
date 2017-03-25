@@ -18,12 +18,12 @@
 		<h1>Questions</h1>
 			<ul>
 				{% for question in questions %}
-				<li>{{ question.question_description }} <p class="text-muted">{{ question.question_text }}</p></li>
+				<li><a href={{ url_for('question_page', questionid = question.question_id) }}>{{ question.question_description }}</a><p class="text-muted">{{ question.question_text }}</p></li>
 				{% endfor %}	
 			</ul>
 		<h1>Active On These URLs</h1>
 		{% if hasData %}
-		<p>This deployment is active on the following URLs<p>
+		<p>This survey is active on the following URLs:<p>
 			<ul>
 				{% for d in deployments %}
 				<li>{{ d.url }}</li>

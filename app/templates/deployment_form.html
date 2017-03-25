@@ -4,7 +4,7 @@
 {% from "_formhelpers.html" import render_field %}
 {{ form.csrf_token }}
 <h1>Create Deployment</h1>
-<p class="text-muted">Edit an existing deployment.</p>
+<p class="text-muted">Create a new deployment.</p>
 <div class="container">
 <form action="/deploymentform" method="post" name="deployment_form">
 	{{ form.hidden_tag() }}

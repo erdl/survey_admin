@@ -28,7 +28,7 @@ def questionform():
 
 @app.route('/surveyform', methods=['GET', 'POST'])
 def survey_form():
-    form=SurveyForm(request.form)
+    form=SurveyForm(request.form).new()
     if request.method == 'POST' and form.validate():
         survey=SurveyInfo(form.description.data, form.surveyname.data)
         try:
@@ -56,7 +56,7 @@ def survey_form():
 
 @app.route('/deploymentform', methods=['GET', 'POST'])
 def deployment_form():
-    form=DeploymentForm(request.form)
+    form=DeploymentForm(request.form).new()
     if request.method == 'POST' and form.validate():
         deployment=DeployedURL(form.url_text.data, form.is_kiosk.data, form.building_id.data)
         try:
@@ -77,6 +77,7 @@ def deployment_form():
                 raise
             finally:
                 db_session.close()
+        return redirect(url_for('show_deployments'))
     else:
         print(form.errors)
     return render_template('deployment_form.html', form=form)
@@ -111,7 +112,7 @@ def edit_deployment_form(deploymentid):
     deployment=DeployedURL.query.filter_by(deployed_url_id=deploymentid).one()
     building=Building.query.filter_by(building_id=deployment.building_id).one()
     kiosksurvey=KioskSurvey.query.filter_by(deployed_url_id=deploymentid).one()
-    form=DeploymentForm(request.form)
+    form=DeploymentForm(request.form).new()
     del form.url_text
     del form.is_kiosk
     del form.building_id
