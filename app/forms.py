@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from .models import *
-from wtforms import SelectField, StringField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField
+from wtforms import SelectField, StringField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField
 from wtforms.validators import DataRequired, ValidationError
 
 class UniqueValidator(object):
@@ -51,7 +51,7 @@ class SurveyForm(FlaskForm):
         return form
 
 class DeploymentForm(FlaskForm):
-    print("Creating deployment form")
+    #print("Creating deployment form")
     url_text=TextField('url_text', description=u'URL (e.g. "frog1kiosk")', validators=[DataRequired(), UniqueValidator(DeployedURL, DeployedURL.url_text)])
     is_kiosk=RadioField('is_kiosk', choices=[('1', "Yes"), ('0', "No")], description=u'Will this URL be deployed on a kiosk?')
     building_id=SelectField('building_id', description=u'Which building will this kiosk be located in?', coerce=int, choices=[(b.building_id, b.name) for b in Building.query.order_by('name')])
@@ -73,18 +73,7 @@ class EditDeploymentForm(FlaskForm):
         form.survey_id.choices=[(s.survey_info_id, s.survey_name) for s in SurveyInfo.query.order_by("survey_name")]
         return form
         
-'''
-class UniqueValidator(object):
-    def __init__(self, model, field):
-        self.model = model
-        self.field = field
+class LoginForm(FlaskForm):
+    username=TextField('username', description=u'Username', validators=[DataRequired()])
+    password=PasswordField('password', description=u'Password', validators=[DataRequired()])
 
-    def __call__(self, form, field):
-        existing = self.model.query(getattr(self.model, self.field) == field.data).get()
-        if 'id' in form:
-            id = int(form.id.data)
-        else:
-            id = None
-        if existing and (id is None or id != existing.key.id()):
-            raise ValidationError('Entry already exists')
-'''

@@ -1,7 +1,19 @@
 from app import db
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
 
+class User(UserMixin):
+    #database of users
+    user_database = {"Admin": ("Admin", "pass")}
+
+    def __init__(self, username, password):
+        self.id = username
+        self.password = password
+
+    @classmethod
+    def get(cls, id):
+        return cls.user_database.get(id)
 
 class Question(db.Model):
     __tablename__="question"
