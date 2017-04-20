@@ -3,9 +3,10 @@
 <div class="well">
 {% from "_formhelpers.html" import render_field %}
 {{ form.csrf_token }}
-<h1>Login</h1>
+<h1>Log In</h1>
+<p class="text-danger">You must log in to see this page.</p>
 <div class="container">
-<form action="/" method="post" name="login_form">
+<form action="/login" method="post" name="login_form">
 	{{ form.hidden_tag() }}
 	<div class="form-group">
 		{{ render_field(form.username) }}

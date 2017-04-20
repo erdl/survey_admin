@@ -2,7 +2,9 @@ from app import db
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
+from passlib.apps import custom_app_context as pwd_context
 
+'''
 class User(UserMixin):
     #database of users
     user_database = {"Admin": ("Admin", "pass")}
@@ -14,6 +16,24 @@ class User(UserMixin):
     @classmethod
     def get(cls, id):
         return cls.user_database.get(id)
+'''
+
+class User(UserMixin, db.Model):
+    __tablename__="users"
+    user_id=db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(32), index = True)
+    password_hash = db.Column(db.String(128))
+
+    def hash_password(self, password):
+        self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
+
+    def __init__(self, username, password=None):
+        self.id = username
+        self.username = username
+        self.password = password
 
 class Question(db.Model):
     __tablename__="question"

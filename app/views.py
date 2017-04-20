@@ -4,7 +4,9 @@ from flask import render_template
 from flask import request
 from flask import url_for
 from app import login_manager
-from flask_login import LoginManager, UserMixin, login_required
+from app import limiter
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+import urllib.parse as urlparse
 from .forms import *
 from .models import *
 from .database import db_session
@@ -25,52 +27,82 @@ def load_user(request):
                 return user
     return None
 '''
-'''
-@login_manager.request_loader
-def load_user(request):
-    username = request.form['username']
-    password = request.form['password']
-    user_entry = User.get(username)
+class UserManager(UserMixin):
+    user_database = {}
+    users = User.query.all()
+    for u in users:
+        user_database[u.username] = (u.username, u.password_hash)
+
+    def __init__(self, username):
+        self.id = username
+        self.username = username
+
+    @classmethod
+    def get(cls,id):
+        return cls.user_database.get(id)
+
+@login_manager.user_loader
+def load_user(user_id):
+    username = user_id
+    user_entry = UserManager.get(username)
     if (user_entry is not None):
         user = User(user_entry[0], user_entry[1])
-        if (user.password == password):
-            return user
+        return user
     return None
-'''
 
-@app.route('/')
-#@login_required
+@app.route('/', methods=["GET"])
+@login_required
 def home():
     return render_template('admin_landing.html')
 
+@app.route('/test')
+def test():
+    return render_template('sortable_test.html')
+
 @app.route('/index')
-#@login_required
+@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/tutorial')
-#@login_required
+@login_required
 def tutorial():
     return render_template('tutorial.html')
 
 @app.route('/login', methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def login():
     print(request.method)
     form = LoginForm(request.form)
-    print("Logging in")
     print("Next: ", request.args.get('next'))
     if form.validate_on_submit(): #and request.method=="POST":
         print("Form is valid")
+        '''
         if form.username.data=="Admin" and form.password.data=="pass":
-            login_user(User(form.username.data, form.password.data))
+        '''
+        user = User.query.filter_by(username = form.username.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            login_user(UserManager(form.username.data))
+            #login_user(UserManager(form.username.data))
         next = request.args.get('next')
         if not is_safe_url(next):
             return abort(400)
         return redirect(next or url_for('home'))
     return render_template('login.html', form=form)
 
+def is_safe_url(target):
+    ref_url = urlparse.urlparse(request.host_url)
+    test_url = urlparse.urlparse(urlparse.urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+@app.route('/logoout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/questionform', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def questionform():
     form = QuestionForm(request.form)
     if request.method == 'POST':
@@ -81,7 +113,7 @@ def questionform():
     return render_template('question_form.html', form=form)
 
 @app.route('/surveyform', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def survey_form():
     form=SurveyForm(request.form).new()
     if request.method == 'POST' and form.validate():
@@ -110,7 +142,7 @@ def survey_form():
     return render_template('survey_form.html', form=form)
 
 @app.route('/deploymentform', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def deployment_form():
     form=DeploymentForm(request.form).new()
     if request.method == 'POST' and form.validate():
@@ -164,7 +196,7 @@ def deployment_form():
     '''
 
 @app.route('/editdeploymentform/<int:deploymentid>', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def edit_deployment_form(deploymentid):
     deployment=DeployedURL.query.filter_by(deployed_url_id=deploymentid).one()
     building=Building.query.filter_by(building_id=deployment.building_id).one()
@@ -209,7 +241,7 @@ def edit_deployment_form(deploymentid):
 '''
 
 @app.route('/question/<int:questionid>', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def question_page(questionid):
     q=Question.query.filter_by(question_id=questionid).one()
     #question=[dict(questiontext=q.questiontext, questionurl=q.questionurl)]
@@ -222,7 +254,7 @@ def question_page(questionid):
     return render_template("questionpage.html", question=q, option=o)
 
 @app.route('/survey/<int:surveyid>', methods=['GET'])
-#@login_required
+@login_required
 def survey_page(surveyid):
     s=SurveyInfo.query.filter_by(survey_info_id=surveyid).one()
     #q=SurveyQuestion.query.filter_by(survey_info_id=surveyid).join(Question, SurveyQuestion.question_id==Question.question_id)
@@ -235,7 +267,7 @@ def survey_page(surveyid):
     return render_template("surveypage.html", survey=s, questions=q, deployments=d, hasData=hasData)
 
 @app.route('/deployment/<int:deployedurlid>', methods=['GET'])
-#@login_required
+@login_required
 def deployment_page(deployedurlid):
     d=DeployedURL.query.filter_by(deployed_url_id=deployedurlid).one()
     b=Building.query.filter_by(building_id=d.building_id).one()
@@ -245,26 +277,26 @@ def deployment_page(deployedurlid):
     return render_template("deploymentpage.html", deployment=d, building=b, survey=s) 
 
 @app.route('/showdevices', methods=['GET'])
-#@login_required
+@login_required
 def show_devices():
     a=ActiveQuestion.query.all()
     aq=[dict(activequestionid=active.activequestionid, activequestionurl=active.activequestionurl, questiontext=(Question.query.filter_by(questionid=active.questionid)).first().questiontext) for active in a] 
     return render_template('show_devices.html', activequestions=aq)
 
 @app.route('/showdeployments', methods=['GET'])
-#@login_required
+@login_required
 def show_deployments():
     d=DeployedURL.query.all()
     return render_template('show_deployments.html', deployments=d)
 
 @app.route('/showsurveys', methods=['GET'])
-#@login_required
+@login_required
 def show_surveys():
     s=SurveyInfo.query.all()
     return render_template('show_surveys.html', surveys=s)
 
 @app.route('/showquestions', methods=['GET'])
-#@login_required
+@login_required
 def show_questions():
     question=Question.query.all()
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
