@@ -70,7 +70,7 @@ def tutorial():
     return render_template('tutorial.html')
 
 @app.route('/login', methods=["GET", "POST"])
-@limiter.limit("10 per hour")
+@limiter.limit("50 per hour")
 def login():
     print(request.method)
     form = LoginForm(request.form)
