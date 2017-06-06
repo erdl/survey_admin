@@ -13,4 +13,4 @@ limiter=Limiter(app, key_func=get_remote_address)
 
 db = SQLAlchemy(app)
 
-from app import views, models
+from . import views, models

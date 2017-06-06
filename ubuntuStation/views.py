@@ -1,10 +1,10 @@
-from app import app
+from . import app
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from app import login_manager
-from app import limiter
+from . import login_manager
+from . import limiter
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 import urllib.parse as urlparse
 from .forms import *
