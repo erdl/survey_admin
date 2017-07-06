@@ -1,4 +1,4 @@
-from . import app
+from ubuntuStation import app
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -72,11 +72,11 @@ def tutorial():
 @app.route('/login', methods=["GET", "POST"])
 @limiter.limit("50 per hour")
 def login():
-    print(request.method)
+    #print(request.method)
     form = LoginForm(request.form)
-    print("Next: ", request.args.get('next'))
+    #print("Next: ", request.args.get('next'))
     if form.validate_on_submit(): #and request.method=="POST":
-        print("Form is valid")
+        #print("Form is valid")
         '''
         if form.username.data=="Admin" and form.password.data=="pass":
         '''
@@ -155,7 +155,7 @@ def deployment_form():
             db_session.rollback()
             raise
         finally:
-            print(deployment.deployed_url_id)
+            #print(deployment.deployed_url_id)
             ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)    
             try:
                 db_session.add(ks)
@@ -246,7 +246,7 @@ def question_page(questionid):
     q=Question.query.filter_by(question_id=questionid).one()
     #question=[dict(questiontext=q.questiontext, questionurl=q.questionurl)]
     o=Option.query.filter_by(question_id=q.question_id)
-    print(o[0])
+    #print(o[0])
     #form=ActiveQuestionForm(request.form)
     #if request.method == 'POST':
     #    db_session.commit()
@@ -272,7 +272,7 @@ def deployment_page(deployedurlid):
     d=DeployedURL.query.filter_by(deployed_url_id=deployedurlid).one()
     b=Building.query.filter_by(building_id=d.building_id).one()
     ks=KioskSurvey.query.filter_by(deployed_url_id=d.deployed_url_id).one()
-    print(ks.survey_info_id)
+    #print(ks.survey_info_id)
     s=SurveyInfo.query.filter_by(survey_info_id=ks.survey_info_id).one()
     return render_template("deploymentpage.html", deployment=d, building=b, survey=s) 
 
