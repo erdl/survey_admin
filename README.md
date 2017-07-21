@@ -1,6 +1,6 @@
 # Survey Admin
 
-![screen_flow_not_loaded](page_flow.png)
+![screen_flow_not_loaded](page_flow.jpg)
 
 The survey admin is an App created by Allie Kim for ERDL to provide a friendly
 user interface to create surveys for the Kiosk project.
