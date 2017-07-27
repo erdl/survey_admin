@@ -106,7 +106,7 @@ def logout():
 def questionform():
     form = QuestionForm(request.form)
     if request.method == 'POST':
-        question=Question(form.questiontext.data, form.questionurl.data)
+        question=Question(form.questiontext.data) #form.questionurl.data
         db_session.add(question)
         db_session.commit()
         return redirect(url_for('show_questions'))
@@ -274,14 +274,7 @@ def deployment_page(deployedurlid):
     ks=KioskSurvey.query.filter_by(deployed_url_id=d.deployed_url_id).one()
     #print(ks.survey_info_id)
     s=SurveyInfo.query.filter_by(survey_info_id=ks.survey_info_id).one()
-    return render_template("deploymentpage.html", deployment=d, building=b, survey=s) 
-
-@app.route('/showdevices', methods=['GET'])
-@login_required
-def show_devices():
-    a=ActiveQuestion.query.all()
-    aq=[dict(activequestionid=active.activequestionid, activequestionurl=active.activequestionurl, questiontext=(Question.query.filter_by(questionid=active.questionid)).first().questiontext) for active in a] 
-    return render_template('show_devices.html', activequestions=aq)
+    return render_template("deploymentpage.html", deployment=d, building=b, survey=s)
 
 @app.route('/showdeployments', methods=['GET'])
 @login_required
