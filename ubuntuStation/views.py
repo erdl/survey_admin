@@ -101,16 +101,19 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+'''
+disabled functionality to add question to the database (see github.com/erdl/survey_admin/ issue #2)
 @app.route('/questionform', methods=['GET', 'POST'])
 @login_required
 def questionform():
     form = QuestionForm(request.form)
     if request.method == 'POST':
-        question=Question(form.questiontext.data, form.questionurl.data)
+        question=Question(form.questiontext.data)
         db_session.add(question)
         db_session.commit()
         return redirect(url_for('show_questions'))
     return render_template('question_form.html', form=form)
+'''
 
 @app.route('/surveyform', methods=['GET', 'POST'])
 @login_required

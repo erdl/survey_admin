@@ -25,11 +25,9 @@ class UniqueValidator(object):
             #print("Error")
             raise ValidationError('Entry with this value already exists in the database')
 
-'''
 class QuestionForm(FlaskForm):
     questiontext = TextAreaField('questiontext', validators=[DataRequired()], description=u'Question')
-    questionurl = TextField('questionurl', validators=[DataRequired()], description=u'Question URL')
-'''
+
 '''
 class ActiveQuestionForm(FlaskForm):
     urls=ActiveQuestion.query.with_entities(ActiveQuestion.activequestionurl)
