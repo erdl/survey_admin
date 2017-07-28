@@ -28,13 +28,6 @@ class UniqueValidator(object):
 class QuestionForm(FlaskForm):
     questiontext = TextAreaField('questiontext', validators=[DataRequired()], description=u'Question')
 
-'''
-class ActiveQuestionForm(FlaskForm):
-    urls=ActiveQuestion.query.with_entities(ActiveQuestion.activequestionurl)
-    print("Hi")
-    print(urls)
-    activequestionurl = SelectField(u"activequestionurl", choices=[(q.activequestionid, q.activequestionurl) for q in ActiveQuestion.query.order_by('activequestionurl')])  
-'''
 
 class SurveyForm(FlaskForm):
     # To insert data into survey_info

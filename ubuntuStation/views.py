@@ -279,13 +279,6 @@ def deployment_page(deployedurlid):
     s=SurveyInfo.query.filter_by(survey_info_id=ks.survey_info_id).one()
     return render_template("deploymentpage.html", deployment=d, building=b, survey=s) 
 
-@app.route('/showdevices', methods=['GET'])
-@login_required
-def show_devices():
-    a=ActiveQuestion.query.all()
-    aq=[dict(activequestionid=active.activequestionid, activequestionurl=active.activequestionurl, questiontext=(Question.query.filter_by(questionid=active.questionid)).first().questiontext) for active in a] 
-    return render_template('show_devices.html', activequestions=aq)
-
 @app.route('/showdeployments', methods=['GET'])
 @login_required
 def show_deployments():
