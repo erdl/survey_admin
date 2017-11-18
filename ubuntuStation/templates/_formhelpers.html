@@ -2,11 +2,11 @@
 	<dt>{{ field.description }}
 	<dd>{{ field(**kwargs)|safe }}
 	{% if field.errors %}
-		<ul style="list-style: none" class=errors>
+		<li class=errors>
 		{% for error in field.errors %}
 			<li><span class="text-danger">{{ error }}</span></li>
 		{% endfor %}
-		</ul>
+		</li>
 	{% endif %}
 	</dd>
 {% endmacro %}

@@ -2,15 +2,13 @@
 {% block content %}
 	<div class="container">
 		<h1>{{ question.question_description }}</h1>
-		<h1>Question Text</h1>
+		<h3>Question Text</h3>
 		<p>{{ question.question_text }}</p>
-		<h1>Options</h1>
+		<h3>Options</h3>
 			<ul>	
 				{% for o in option %}
 				<li>{{ o.text }}</li>
 				{% endfor %}
 			</ul>
-		<h1>Active on these URLs</h1>
-		<!--<p>This question is active on the following URLs<p>-->
 	</div>
 {% endblock %}
