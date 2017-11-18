@@ -2535,7 +2535,8 @@ input[type="range"] {
 }
 select[multiple],
 select[size] {
-  height: auto;
+  height: 450px;
+  width: 300px;
 }
 input[type="file"]:focus,
 input[type="radio"]:focus,
