@@ -25,9 +25,18 @@ class UniqueValidator(object):
             #print("Error")
             raise ValidationError('Entry with this value already exists in the database')
 
+'''
 class QuestionForm(FlaskForm):
     questiontext = TextAreaField('questiontext', validators=[DataRequired()], description=u'Question')
-
+    questionurl = TextField('questionurl', validators=[DataRequired()], description=u'Question URL')
+'''
+'''
+class ActiveQuestionForm(FlaskForm):
+    urls=ActiveQuestion.query.with_entities(ActiveQuestion.activequestionurl)
+    print("Hi")
+    print(urls)
+    activequestionurl = SelectField(u"activequestionurl", choices=[(q.activequestionid, q.activequestionurl) for q in ActiveQuestion.query.order_by('activequestionurl')])  
+'''
 
 class SurveyForm(FlaskForm):
     # To insert data into survey_info
@@ -44,7 +53,7 @@ class SurveyForm(FlaskForm):
 class DeploymentForm(FlaskForm):
     #print("Creating deployment form")
     url_text=TextField('url_text', description=u'URL (e.g. "frog1kiosk")', validators=[DataRequired(), UniqueValidator(DeployedURL, DeployedURL.url_text)])
-    is_kiosk=RadioField('is_kiosk', choices=[('1', "Yes"), ('0', "No")], description=u'Will this URL be deployed on a kiosk?')
+    is_kiosk=RadioField('is_kiosk', choices=[('1', "Yes - Shows only one question and reloads the same question after it is answered."), ('0', "No - Shows multiple questions on the same page and does not reload the questions after the form is submitted.")], description=u'Will this URL be deployed on a kiosk?')
     building_id=SelectField('building_id', description=u'Which building will this kiosk be located in?', coerce=int, choices=[(b.building_id, b.name) for b in Building.query.order_by('name')])
     survey_id=SelectField('survey_id', description=u'Which survey should be shown on this kiosk?', coerce=int, choices=[(s.survey_info_id, s.survey_name) for s in SurveyInfo.query.order_by("survey_name")])
     
