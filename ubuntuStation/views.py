@@ -55,15 +55,6 @@ def load_user(user_id):
 def home():
     return render_template('admin_landing.html')
 
-@app.route('/test')
-def test():
-    return render_template('sortable_test.html')
-
-@app.route('/index')
-@login_required
-def index():
-    return render_template('index.html')
-
 @app.route('/tutorial')
 @login_required
 def tutorial():
