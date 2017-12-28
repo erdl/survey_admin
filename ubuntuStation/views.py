@@ -248,7 +248,7 @@ def edit_deployment_form(deploymentid):
 def question_page(questionid):
     q=Question.query.filter_by(question_id=questionid).one()
     #question=[dict(questiontext=q.questiontext, questionurl=q.questionurl)]
-    o=Option.query.filter_by(question_id=q.question_id)
+    o=Option.query.filter_by(question_id=q.question_id).order_by('response_position')
     #print(o[0])
     #form=ActiveQuestionForm(request.form)
     #if request.method == 'POST':

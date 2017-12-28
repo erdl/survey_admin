@@ -42,12 +42,12 @@ class SurveyForm(FlaskForm):
     # To insert data into survey_info
     surveyname=TextField('survey_name', description=u'Survey Name', validators=[DataRequired(), UniqueValidator(SurveyInfo, SurveyInfo.survey_name)])
     description=TextAreaField('description', description=u'Description')
-    question=SelectMultipleField(u'question', validators=[DataRequired()], description=u'Which questions should be a part of this survey?', coerce=int, choices=[(q.question_id, q.question_description) for q in Question.query.order_by('question_description')])
+    question=SelectMultipleField(u'question', validators=[DataRequired()], description=u'(Question ID) Which questions should be a part of this survey?', coerce=int, choices=[(q.question_id, q.question_description) for q in Question.query.order_by('question_description')])
 
     @classmethod
     def new(cls):
         form=cls()
-        form.question.choices=[(q.question_id, q.question_description) for q in Question.query.order_by('question_description')]
+        form.question.choices=[(q.question_id, '(' + str(q.question_id) + ')   ' + str(0 if q.question_description is None else q.question_description)) for q in Question.query.order_by('question_description')]
         return form
 
 class DeploymentForm(FlaskForm):
