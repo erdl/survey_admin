@@ -1,6 +1,5 @@
 from ubuntuStation import app
 from flask import redirect
-from flask import render_template
 from flask import request
 from flask import url_for
 from . import login_manager
@@ -10,6 +9,72 @@ import urllib.parse as urlparse
 from .forms import *
 from .models import *
 from .database import db_session
+from flask_oauthlib.client import OAuth
+from flask import Flask, redirect, url_for, session, request, flash, render_template, jsonify
+
+app.config['GOOGLE_ID'] = "656520081352-avhsb9ku18bi10ol4a3q27h5h6mtmld2.apps.googleusercontent.com"
+app.config['GOOGLE_SECRET'] = "WWF62MtFoNUihMIlKbr9d4kV"
+app.secret_key = 'development'
+oauth = OAuth(app)
+
+google = oauth.remote_app(
+    'google',
+    consumer_key=app.config.get('GOOGLE_ID'),
+    consumer_secret=app.config.get('GOOGLE_SECRET'),
+    request_token_params={
+        'scope': 'email'
+    },
+    base_url='https://www.googleapis.com/oauth2/v1/',
+    request_token_url=None,
+    access_token_method='POST',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+)
+
+@app.route('/info')
+def index():
+    if 'google_token' in session:
+        me = google.get('userinfo')
+        return jsonify({"data": me.data})
+    return redirect(url_for('login'))
+
+@app.route('/', methods=["GET"])
+def home():
+    return render_template('admin_landing.html')
+
+@app.route('/tutorial')
+def tutorial():
+    #flash('Successfully connected')
+    return render_template('tutorial.html')
+
+@app.route('/login')
+def login():
+    return google.authorize(callback=url_for('authorized', _external=True))
+
+
+@app.route('/logout')
+def logout():
+    session.pop('google_token', None)
+    flash('Successfully disconnected')
+    return redirect(url_for('home'))
+
+
+@app.route('/login/authorized')
+def authorized():
+    resp = google.authorized_response()
+    if resp is None:
+        return 'Access denied: reason=%s error=%s' % (
+            request.args['error_reason'],
+            request.args['error_description']
+        )
+    session['google_token'] = (resp['access_token'], '')
+    #me = google.get('userinfo')
+    #return jsonify({"data": me.data})
+    return redirect(url_for('tutorial'))
+
+@google.tokengetter
+def get_google_oauth_token():
+    return session.get('google_token')
 
 '''
 @login_manager.request_loader
@@ -26,6 +91,7 @@ def load_user(request):
             if (user.password == password):
                 return user
     return None
+'''
 '''
 class UserManager(UserMixin):
     user_database = {}
@@ -49,17 +115,8 @@ def load_user(user_id):
         user = User(user_entry[0], user_entry[1])
         return user
     return None
-
-@app.route('/', methods=["GET"])
-@login_required
-def home():
-    return render_template('admin_landing.html')
-
-@app.route('/tutorial')
-@login_required
-def tutorial():
-    return render_template('tutorial.html')
-
+'''
+'''
 @app.route('/login', methods=["GET", "POST"])
 @limiter.limit("50 per hour")
 def login():
@@ -68,9 +125,7 @@ def login():
     #print("Next: ", request.args.get('next'))
     if form.validate_on_submit(): #and request.method=="POST":
         #print("Form is valid")
-        '''
-        if form.username.data=="Admin" and form.password.data=="pass":
-        '''
+        #if form.username.data=="Admin" and form.password.data=="pass":
         user = User.query.filter_by(username = form.username.data).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(UserManager(form.username.data))
@@ -87,11 +142,11 @@ def is_safe_url(target):
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 @app.route('/logoout')
-@login_required
+#@login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
+'''
 '''
 disabled functionality to add question to the database (see github.com/erdl/survey_admin/ issue #2)
 @app.route('/questionform', methods=['GET', 'POST'])
@@ -107,7 +162,7 @@ def questionform():
 '''
 
 @app.route('/surveyform', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def survey_form():
     form=SurveyForm(request.form).new()
     if request.method == 'POST' and form.validate():
@@ -136,7 +191,7 @@ def survey_form():
     return render_template('survey_form.html', form=form)
 
 @app.route('/deploymentform', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def deployment_form():
     form=DeploymentForm(request.form).new()
     if request.method == 'POST' and form.validate():
@@ -190,7 +245,7 @@ def deployment_form():
     '''
 
 @app.route('/editdeploymentform/<int:deploymentid>', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def edit_deployment_form(deploymentid):
     deployment=DeployedURL.query.filter_by(deployed_url_id=deploymentid).one()
     building=Building.query.filter_by(building_id=deployment.building_id).one()
@@ -235,7 +290,7 @@ def edit_deployment_form(deploymentid):
 '''
 
 @app.route('/question/<int:questionid>', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def question_page(questionid):
     q=Question.query.filter_by(question_id=questionid).one()
     #question=[dict(questiontext=q.questiontext, questionurl=q.questionurl)]
@@ -248,7 +303,7 @@ def question_page(questionid):
     return render_template("questionpage.html", question=q, option=o)
 
 @app.route('/survey/<int:surveyid>', methods=['GET'])
-@login_required
+#@login_required
 def survey_page(surveyid):
     s=SurveyInfo.query.filter_by(survey_info_id=surveyid).one()
     #q=SurveyQuestion.query.filter_by(survey_info_id=surveyid).join(Question, SurveyQuestion.question_id==Question.question_id)
@@ -261,7 +316,7 @@ def survey_page(surveyid):
     return render_template("surveypage.html", survey=s, questions=q, deployments=d, hasData=hasData)
 
 @app.route('/deployment/<int:deployedurlid>', methods=['GET'])
-@login_required
+#@login_required
 def deployment_page(deployedurlid):
     d=DeployedURL.query.filter_by(deployed_url_id=deployedurlid).one()
     b=Building.query.filter_by(building_id=d.building_id).one()
@@ -271,19 +326,19 @@ def deployment_page(deployedurlid):
     return render_template("deploymentpage.html", deployment=d, building=b, survey=s) 
 
 @app.route('/showdeployments', methods=['GET'])
-@login_required
+#@login_required
 def show_deployments():
     d=DeployedURL.query.all()
     return render_template('show_deployments.html', deployments=d)
 
 @app.route('/showsurveys', methods=['GET'])
-@login_required
+#@login_required
 def show_surveys():
     s=SurveyInfo.query.all()
     return render_template('show_surveys.html', surveys=s)
 
 @app.route('/showquestions', methods=['GET'])
-@login_required
+#@login_required
 def show_questions():
     question=Question.query.all()
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
