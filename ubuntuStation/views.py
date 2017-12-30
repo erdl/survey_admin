@@ -1,152 +1,110 @@
 from ubuntuStation import app
-from flask import redirect
-from flask import request
-from flask import url_for
+from flask import redirect, url_for, session, request, render_template
 from . import login_manager
-from . import limiter
-from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
-import urllib.parse as urlparse
+from flask_login import login_required, login_user, logout_user, current_user
+import json
 from .forms import *
 from .models import *
 from .database import db_session
-from flask_oauthlib.client import OAuth
-from flask import Flask, redirect, url_for, session, request, flash, render_template, jsonify
+from requests_oauthlib import OAuth2Session
 
-app.config['GOOGLE_ID'] = "656520081352-avhsb9ku18bi10ol4a3q27h5h6mtmld2.apps.googleusercontent.com"
-app.config['GOOGLE_SECRET'] = "WWF62MtFoNUihMIlKbr9d4kV"
-app.secret_key = 'development'
-oauth = OAuth(app)
+class Auth:
+    CLIENT_ID = ('656520081352-avhsb9ku18bi10ol4a3q27h5h6mtmld2.apps.googleusercontent.com')
+    CLIENT_SECRET = 'WWF62MtFoNUihMIlKbr9d4kV'
+    REDIRECT_URI = 'http://localhost:8989/gCallback'
+    AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
+    TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
+    USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
+    SCOPE = ['email']
 
-google = oauth.remote_app(
-    'google',
-    consumer_key=app.config.get('GOOGLE_ID'),
-    consumer_secret=app.config.get('GOOGLE_SECRET'),
-    request_token_params={
-        'scope': 'email'
-    },
-    base_url='https://www.googleapis.com/oauth2/v1/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-)
+class Config:
+    APP_NAME = "Survey Admin "
+    SECRET_KEY = "development"
 
-@app.route('/info')
-def index():
-    if 'google_token' in session:
-        me = google.get('userinfo')
-        return jsonify({"data": me.data})
-    return redirect(url_for('login'))
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+def get_google_auth(state=None, token=None):
+    if token:
+        return OAuth2Session(Auth.CLIENT_ID, token=token)
+    if state:
+        return OAuth2Session(
+            Auth.CLIENT_ID,
+            state=state,
+            redirect_uri=Auth.REDIRECT_URI)
+    oauth = OAuth2Session(
+        Auth.CLIENT_ID,
+        redirect_uri=Auth.REDIRECT_URI,
+        scope=Auth.SCOPE)
+    return oauth
 
 @app.route('/', methods=["GET"])
+@login_required
 def home():
     return render_template('admin_landing.html')
 
 @app.route('/tutorial')
+@login_required
 def tutorial():
-    #flash('Successfully connected')
     return render_template('tutorial.html')
 
 @app.route('/login')
 def login():
-    return google.authorize(callback=url_for('authorized', _external=True))
+    if current_user.is_authenticated:
+        return redirect(next or url_for('home'))
+    google = get_google_auth()
+    auth_url, state = google.authorization_url(
+        Auth.AUTH_URI, access_type='offline')
+    session['oauth_state'] = state
+    return render_template('login.html', auth_url=auth_url)
 
+@app.route('/gCallback')
+def callback():
+    # Redirect user to home page if already logged in.
+    #if current_user is not None and current_user.is_authenticated():
+        #return redirect(url_for('home'))
+    if 'error' in request.args:
+        if request.args.get('error') == 'access_denied':
+            return 'You denied access.'
+        return 'Error encountered.'
+    if 'code' not in request.args and 'state' not in request.args:
+        return redirect(url_for('login'))
+    else:
+        # Execution reaches here when user has
+        # successfully authenticated our app.
+        google = get_google_auth(state=session['oauth_state'])
+        try:
+            token = google.fetch_token(
+                Auth.TOKEN_URI,
+                client_secret=Auth.CLIENT_SECRET,
+                authorization_response=request.url)
+        except HTTPError:
+            return 'HTTPError occurred.'
+        google = get_google_auth(token=token)
+        resp = google.get(Auth.USER_INFO)
+        if resp.status_code == 200:
+            user_data = resp.json()
+            email = user_data['email']
+            user = User.query.filter_by(email=email).first()
+            if user is None:
+                #user = User()
+                #user.email = email
+                return 'You are denied access.'
+            user.name = user_data['name']
+            print(token)
+            user.tokens = json.dumps(token)
+            db.session.add(user)
+            db.session.commit()
+            login_user(user)
+            return redirect(url_for('home'))
+        return 'Could not fetch your information.'
 
 @app.route('/logout')
-def logout():
-    session.pop('google_token', None)
-    flash('Successfully disconnected')
-    return redirect(url_for('home'))
-
-
-@app.route('/login/authorized')
-def authorized():
-    resp = google.authorized_response()
-    if resp is None:
-        return 'Access denied: reason=%s error=%s' % (
-            request.args['error_reason'],
-            request.args['error_description']
-        )
-    session['google_token'] = (resp['access_token'], '')
-    #me = google.get('userinfo')
-    #return jsonify({"data": me.data})
-    return redirect(url_for('tutorial'))
-
-@google.tokengetter
-def get_google_oauth_token():
-    return session.get('google_token')
-
-'''
-@login_manager.request_loader
-def load_user(request):
-    token = request.headers.get('Authorization')
-    if token is None:
-        token = request.args.get('token')
-
-    if token is not None:
-        username,password = token.split(":")
-        user_entry = User.get(username)
-        if (user_entry is not None):
-            user = User(user_entry[0], user_entry[1])
-            if (user.password == password):
-                return user
-    return None
-'''
-'''
-class UserManager(UserMixin):
-    user_database = {}
-    users = User.query.all()
-    for u in users:
-        user_database[u.username] = (u.username, u.password_hash)
-
-    def __init__(self, username):
-        self.id = username
-        self.username = username
-
-    @classmethod
-    def get(cls,id):
-        return cls.user_database.get(id)
-
-@login_manager.user_loader
-def load_user(user_id):
-    username = user_id
-    user_entry = UserManager.get(username)
-    if (user_entry is not None):
-        user = User(user_entry[0], user_entry[1])
-        return user
-    return None
-'''
-'''
-@app.route('/login', methods=["GET", "POST"])
-@limiter.limit("50 per hour")
-def login():
-    #print(request.method)
-    form = LoginForm(request.form)
-    #print("Next: ", request.args.get('next'))
-    if form.validate_on_submit(): #and request.method=="POST":
-        #print("Form is valid")
-        #if form.username.data=="Admin" and form.password.data=="pass":
-        user = User.query.filter_by(username = form.username.data).first()
-        if user is not None and user.verify_password(form.password.data):
-            login_user(UserManager(form.username.data))
-            #login_user(UserManager(form.username.data))
-        next = request.args.get('next')
-        if not is_safe_url(next):
-            return abort(400)
-        return redirect(next or url_for('home'))
-    return render_template('login.html', form=form)
-
-def is_safe_url(target):
-    ref_url = urlparse.urlparse(request.host_url)
-    test_url = urlparse.urlparse(urlparse.urljoin(request.host_url, target))
-    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
-
-@app.route('/logoout')
-#@login_required
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
-'''
 '''
 disabled functionality to add question to the database (see github.com/erdl/survey_admin/ issue #2)
 @app.route('/questionform', methods=['GET', 'POST'])
@@ -162,7 +120,7 @@ def questionform():
 '''
 
 @app.route('/surveyform', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def survey_form():
     form=SurveyForm(request.form).new()
     if request.method == 'POST' and form.validate():
@@ -177,7 +135,7 @@ def survey_form():
         finally:
             db_session.close()
         for question_id in form.question.data:
-            q=SurveyQuestion(survey_id, question_id, 1) 
+            q=SurveyQuestion(survey_id, question_id, 1)
             try:
                 db_session.add(q)
                 db_session.commit()
@@ -191,7 +149,7 @@ def survey_form():
     return render_template('survey_form.html', form=form)
 
 @app.route('/deploymentform', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def deployment_form():
     form=DeploymentForm(request.form).new()
     if request.method == 'POST' and form.validate():
@@ -205,7 +163,7 @@ def deployment_form():
             raise
         finally:
             #print(deployment.deployed_url_id)
-            ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)    
+            ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)
             try:
                 db_session.add(ks)
                 db_session.commit()
@@ -245,7 +203,7 @@ def deployment_form():
     '''
 
 @app.route('/editdeploymentform/<int:deploymentid>', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def edit_deployment_form(deploymentid):
     deployment=DeployedURL.query.filter_by(deployed_url_id=deploymentid).one()
     building=Building.query.filter_by(building_id=deployment.building_id).one()
@@ -290,7 +248,7 @@ def edit_deployment_form(deploymentid):
 '''
 
 @app.route('/question/<int:questionid>', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def question_page(questionid):
     q=Question.query.filter_by(question_id=questionid).one()
     #question=[dict(questiontext=q.questiontext, questionurl=q.questionurl)]
@@ -303,7 +261,7 @@ def question_page(questionid):
     return render_template("questionpage.html", question=q, option=o)
 
 @app.route('/survey/<int:surveyid>', methods=['GET'])
-#@login_required
+@login_required
 def survey_page(surveyid):
     s=SurveyInfo.query.filter_by(survey_info_id=surveyid).one()
     #q=SurveyQuestion.query.filter_by(survey_info_id=surveyid).join(Question, SurveyQuestion.question_id==Question.question_id)
@@ -316,29 +274,29 @@ def survey_page(surveyid):
     return render_template("surveypage.html", survey=s, questions=q, deployments=d, hasData=hasData)
 
 @app.route('/deployment/<int:deployedurlid>', methods=['GET'])
-#@login_required
+@login_required
 def deployment_page(deployedurlid):
     d=DeployedURL.query.filter_by(deployed_url_id=deployedurlid).one()
     b=Building.query.filter_by(building_id=d.building_id).one()
     ks=KioskSurvey.query.filter_by(deployed_url_id=d.deployed_url_id).one()
     #print(ks.survey_info_id)
     s=SurveyInfo.query.filter_by(survey_info_id=ks.survey_info_id).one()
-    return render_template("deploymentpage.html", deployment=d, building=b, survey=s) 
+    return render_template("deploymentpage.html", deployment=d, building=b, survey=s)
 
 @app.route('/showdeployments', methods=['GET'])
-#@login_required
+@login_required
 def show_deployments():
     d=DeployedURL.query.all()
     return render_template('show_deployments.html', deployments=d)
 
 @app.route('/showsurveys', methods=['GET'])
-#@login_required
+@login_required
 def show_surveys():
     s=SurveyInfo.query.all()
     return render_template('show_surveys.html', surveys=s)
 
 @app.route('/showquestions', methods=['GET'])
-#@login_required
+@login_required
 def show_questions():
     question=Question.query.all()
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
