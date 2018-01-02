@@ -7,15 +7,16 @@ from .forms import *
 from .models import *
 from .database import db_session
 from requests_oauthlib import OAuth2Session
+from .database import data
 
 class Auth:
-    CLIENT_ID = ('656520081352-avhsb9ku18bi10ol4a3q27h5h6mtmld2.apps.googleusercontent.com')
-    CLIENT_SECRET = 'WWF62MtFoNUihMIlKbr9d4kV'
-    REDIRECT_URI = 'http://localhost:8989/gCallback'
-    AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
-    TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
-    USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
-    SCOPE = ['email']
+    CLIENT_ID = data["CLIENT_ID"]
+    CLIENT_SECRET = data["CLIENT_SECRET"]
+    REDIRECT_URI = data["REDIRECT_URI"]
+    AUTH_URI = data["AUTH_URI"]
+    TOKEN_URI = data["TOKEN_URI"]
+    USER_INFO = data["USER_INFO"]
+    SCOPE = data["SCOPE"]
 
 class Config:
     APP_NAME = "Survey Admin "
