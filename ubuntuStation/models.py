@@ -4,7 +4,7 @@ from sqlalchemy import PrimaryKeyConstraint
 
 class User(db.Model, UserMixin):
     __tablename__ = "oauth"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Text, nullable=True)
     email = db.Column(db.String(50), unique=True, nullable=False)
     tokens = db.Column(db.Text)

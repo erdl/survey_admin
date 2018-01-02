@@ -90,7 +90,7 @@ def callback():
             if user is None:
                 #user = User()
                 #user.email = email
-                return 'You are denied access.'
+                return redirect(url_for('login'))
             user.name = user_data['name']
             print(token)
             user.tokens = json.dumps(token)
@@ -302,3 +302,28 @@ def show_questions():
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
     entries=question
     return render_template('show_questions.html', questions=entries)
+
+@app.route('/createuser', methods=['GET', 'POST'])
+@login_required
+def create_user():
+    form=UserForm(request.form).new()
+    if request.method == 'POST' and form.validate():
+        user=User(name=form.name.data, email=form.email.data)
+        try:
+            db_session.add(user)
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
+        return redirect(url_for('show_users'))
+    else:
+        print(form.errors)
+    return render_template('user_form.html', form=form)
+
+@app.route('/showusers', methods=['GET'])
+@login_required
+def show_users():
+    u=User.query.all()
+    return render_template('show_users.html', users=u)
