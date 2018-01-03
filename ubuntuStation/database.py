@@ -4,7 +4,7 @@ import json
 
 with open('config.json') as json_data_file:
     data=json.load(json_data_file)
-url = 'postgresql://' + data["user"] + ":" + data["pass"] + "@localhost" + ":" + data["port"] + "/" + "dbname"
+url = 'postgresql://' + data["user"] + ":" + data["pass"] + "@localhost" + ":" + data["port"] + "/" + data["dbname"]
 
 engine=create_engine(url)
 db_session=scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
