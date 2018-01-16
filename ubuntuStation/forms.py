@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from .models import *
-from wtforms import SelectField, StringField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField
+from wtforms import SelectField, IntegerField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField, FieldList, FormField
 from wtforms.validators import DataRequired, ValidationError
 
 class UniqueValidator(object):
@@ -25,11 +25,23 @@ class UniqueValidator(object):
             #print("Error")
             raise ValidationError('Entry with this value already exists in the database')
 
-'''
+
+class QuestionEntryForm(FlaskForm):
+    option=SelectField('option',validators=[DataRequired()],choices=[(o.text, o.text) for o in Option.query.distinct('text').order_by('text', 'option_id')])
+    responseposition=IntegerField('responseposition',validators=[DataRequired()])
+    optioncolor=TextField('optioncolor', validators=[DataRequired()], description=u'Option Color')
+
 class QuestionForm(FlaskForm):
-    questiontext = TextAreaField('questiontext', validators=[DataRequired()], description=u'Question')
-    questionurl = TextField('questionurl', validators=[DataRequired()], description=u'Question URL')
-'''
+    questiontext = TextField('questiontext', validators=[DataRequired()], description=u'Question Text')
+    questiondescription = TextField('questiondescription', validators=[DataRequired()], description=u'Description')
+    questiontype = TextField('questiontype', validators=[DataRequired()], description=u'Type')
+    entries=FieldList(FormField(QuestionEntryForm), min_entries=1)
+
+    @classmethod
+    def new(cls):
+        form=cls()
+        return form
+
 '''
 class ActiveQuestionForm(FlaskForm):
     urls=ActiveQuestion.query.with_entities(ActiveQuestion.activequestionurl)
