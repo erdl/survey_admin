@@ -1,39 +1,13 @@
 from . import db
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
-from passlib.apps import custom_app_context as pwd_context
+from sqlalchemy import PrimaryKeyConstraint
 
-'''
-class User(UserMixin):
-    #database of users
-    user_database = {"Admin": ("Admin", "pass")}
-
-    def __init__(self, username, password):
-        self.id = username
-        self.password = password
-
-    @classmethod
-    def get(cls, id):
-        return cls.user_database.get(id)
-'''
-
-class User(UserMixin, db.Model):
-    __tablename__="users"
-    user_id=db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(32), index = True)
-    password_hash = db.Column(db.String(128))
-
-    def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
-
-    def verify_password(self, password):
-        return pwd_context.verify(password, self.password_hash)
-
-    def __init__(self, username, password=None):
-        self.id = username
-        self.username = username
-        self.password = password
+class User(db.Model, UserMixin):
+    __tablename__ = "oauth"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.Text, nullable=True)
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    tokens = db.Column(db.Text)
 
 class Question(db.Model):
     __tablename__="question"
@@ -47,11 +21,12 @@ class Question(db.Model):
 
 class Option(db.Model):
     __tablename__="option"
-    option_id=db.Column(db.Integer, primary_key=True, nullable=False)
-    text=db.Column(db.String(45), nullable=False)
-    value=db.Column(db.String(45), nullable=False)
     question_id=db.Column(db.Integer, db.ForeignKey('question.question_id'), nullable=False)
+    text=db.Column(db.String(45), nullable=False)
+    option_id=db.Column(db.Integer, primary_key=True, nullable=False)
+    value=db.Column(db.String(45), nullable=False)
     response_position=db.Column(db.Integer, nullable=False)
+    option_color=db.Column(db.String(7), nullable=False)
 
     def __repr__(self):
         return '<option_text %r>' % (self.text)
