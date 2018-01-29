@@ -10,19 +10,36 @@
 	<fieldset>
 	{{ form.hidden_tag() }}
 	<div class="form-group">
-		<p><b>URL:</b> {{ ks.url }}</p>
-		<p><b>Building:</b> {{ b.name }}</p>
-		<p>
-		<b>Kiosk View?</b>
-		{% if d.is_kioski %}
-		 Yes
+		{% if 'url_text' in form %}
+			{{ render_field(form.url_text) }}
 		{% else %}
-		 No
+		  	<label class="control-label" for="disabledInput">URL</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
 		{% endif %}
-		</p>	
-	</div> 
+	</div>
 	<div class="form-group">
-		{{ render_field(form.survey_id) }}
+		{% if 'building_id' in form %}
+			{{ render_field(form.building_id) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">Building ID</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
+	</div>
+	<div class="form-group">
+		{% if 'is_kiosk' in form %}
+			{{ render_field(form.is_kiosk) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">Kiosk View</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
+	</div>
+	<div class="form-group">
+		{% if 'survey_id' in form %}
+			{{ render_field(form.survey_id) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">Survey Name</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
 	</div>
 
 	<a href="{{ url_for('deployment_page', deployedurlid=did) }}" class="btn btn-default">Cancel</a>

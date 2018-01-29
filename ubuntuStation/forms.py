@@ -27,11 +27,23 @@ class UniqueValidator(object):
 
 
 class QuestionEntryForm(FlaskForm):
-    option=SelectField('option',validators=[DataRequired()],choices=[(o.text, o.text) for o in Option.query.distinct('text').order_by('text', 'option_id')])
+    #option=SelectField('option',validators=[DataRequired()],choices=[(o.text, o.text) for o in Option.query.distinct('text').order_by('text', 'option_id')])
+    option=TextField('option', validators=[DataRequired()], description=u'Option')
     responseposition=IntegerField('responseposition',validators=[DataRequired()])
     optioncolor=TextField('optioncolor', validators=[DataRequired()], description=u'Option Color')
 
 class QuestionForm(FlaskForm):
+    questiontext = TextField('questiontext', validators=[DataRequired()], description=u'Question Text')
+    questiondescription = TextField('questiondescription', validators=[DataRequired()], description=u'Description')
+    questiontype = TextField('questiontype', validators=[DataRequired()], description=u'Type')
+    entries=FieldList(FormField(QuestionEntryForm), min_entries=1)
+
+    @classmethod
+    def new(cls):
+        form=cls()
+        return form
+
+class EditQuestionForm(FlaskForm):
     questiontext = TextField('questiontext', validators=[DataRequired()], description=u'Question Text')
     questiondescription = TextField('questiondescription', validators=[DataRequired()], description=u'Description')
     questiontype = TextField('questiontype', validators=[DataRequired()], description=u'Type')

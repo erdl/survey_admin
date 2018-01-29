@@ -3,10 +3,11 @@
 <div class="well">
 {% from "_formhelpers.html" import render_field %}
 {{ form.csrf_token }}
-<h1>Create Question</h1>
-<p class="text-muted">Use this form to add a question with a description and type</p>
+<h1>Edit Question</h1>
+<p class="text-muted">Edit an existing question.</p>
 <div class="container">
-<form action="/questionform" method="post" name="question_form">
+<form action={{ url_for('edit_question_form', questionid=qid) }}  method="post" name="edit_question_form">
+	<fieldset>
 	{{ form.hidden_tag() }}
 	<div class="form-group">
 		{{ render_field(form.questiontext) }}
@@ -21,24 +22,24 @@
 		<label>Add more entries</label>
 		<button type="button" data-toggle="fieldset-add-row"
 									  data-target="#option-fieldset">+</button>
-	<table>
-		<tr>
-			<th>Option</th>
-			<th>Response Position</th>
-			<th>
-				<a href="http://www.color-hex.com/" target="_blank" >Option Color</a>
-			</th>
-		</tr>
-		{% for entries in form.entries %}
-			<tr data-toggle="fieldset-entry">
-				<td>{{ entries.option }}</td>
-				<td>{{ entries.responseposition }}</td>
-				<td>{{ entries.optioncolor }}</td>
-				<td><button type="button" data-toggle="fieldset-remove-row" id="entries-{{loop.index0}}-remove">-</button></td>
+		<table>
+			<tr>
+				<th>Option</th>
+				<th>Response Position</th>
+				<th>
+					<a href="http://www.color-hex.com/" target="_blank" >Option Color</a>
+				</th>
 			</tr>
-		{% endfor %}
-	</table>
-</div>
+			{% for entries in form.entries %}
+				<tr data-toggle="fieldset-entry">
+					<td>{{ entries.option }}</td>
+					<td>{{ entries.responseposition }}</td>
+					<td>{{ entries.optioncolor }}</td>
+					<td><button type="button" data-toggle="fieldset-remove-row" id="entries-{{loop.index0}}-remove">-</button></td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
 	<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
     <script src="{{ url_for("static", filename="questionpage.js") }}"></script>
     <script type="text/javascript">
@@ -51,8 +52,12 @@
             }
         }
     });
-</script>
-	<a href="{{ url_for('show_questions') }}" class="btn btn-default">Cancel</a>
-	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
+	</script>
+	<a href="{{ url_for('question_page', questionid=qid) }}" class="btn btn-default">Cancel</a>
+	<button type ="submit" name="action" class="btn btn-primary" value="Submit">Submit</button>
+	<!--<button type ="submit" name="action" style="margin-right:150px;float:right" class="btn btn-danger" value="Delete">Delete</button>-->
+	</fieldset>
 </form>
+</div>
+</div>
 {% endblock %}

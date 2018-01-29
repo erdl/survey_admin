@@ -125,9 +125,7 @@ def question_form():
             raise
         finally:
             db_session.close()
-        print(form.entries.data)
         for entries in form.entries.data:
-            print(entries)
             o=Option(question_id=question_id, text=entries['option'], response_position=entries['responseposition'], option_color=entries['optioncolor'])
             try:
                 db_session.add(o)
@@ -231,15 +229,17 @@ def edit_deployment_form(deploymentid):
     building=Building.query.filter_by(building_id=deployment.building_id).one()
     kiosksurvey=KioskSurvey.query.filter_by(deployed_url_id=deploymentid).one()
     form=DeploymentForm(request.form).new()
-    del form.url_text
-    del form.is_kiosk
-    del form.building_id
+
+    if request.method == 'GET':
+        form.url_text.data = deployment.url_text
+        form.building_id.data = building.building_id
+        form.is_kiosk.data = deployment.is_kioski       #currently not selecting
+        form.survey_id.data = kiosksurvey.survey_info_id
+
     if request.method == 'POST':
-        #kiosksurvey.survey_info_id=form.survey_id.data
-        #TODO: debug this, kiosk_survey table isn't getting updated
         try:
-            db_session.query(KioskSurvey).filter_by(deployed_url_id=deploymentid).update({"survey_info_id": form.survey_id.data})
-            #print(kiosksurvey.survey_info_id)
+            db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"url_text": form.url_text.data, "is_kioski": form.is_kiosk.data, "building_id": form.building_id.data})
+            db_session.query(KioskSurvey).filter_by(deployed_url_id=deploymentid).update({"url": form.url_text.data, "survey_info_id": form.survey_id.data})
             db_session.commit()
         except:
             print("Error inserting into kiosk_survey")
@@ -282,6 +282,52 @@ def question_page(questionid):
     #    return redirect(url_for('show_questions'))
     return render_template("questionpage.html", question=q, option=o)
 
+@app.route('/editquestionform/<int:questionid>', methods=['GET', 'POST'])
+@login_required
+def edit_question_form(questionid):
+    question=Question.query.filter_by(question_id=questionid).one()
+    form=QuestionForm(request.form).new()
+    if request.method == 'GET':
+        form.questiontext.data = question.question_text
+        form.questiondescription.data = question.question_description
+        form.questiontype.data = question.question_type
+
+    if request.method == 'POST':
+        if request.form['action'] == 'Submit':
+            try:
+                db_session.query(Question).filter_by(question_id=questionid).update({"question_text": form.questiontext.data, "question_description": form.questiondescription.data, "question_type": form.questiontype.data})
+                db_session.query(Option).filter_by(question_id=questionid).delete()
+                db_session.commit()
+            except:
+                print("Error inserting into kiosk_survey")
+                db_session.rollback()
+            finally:
+                db_session.close()
+            for entries in form.entries.data:
+                o=Option(question_id=questionid, text=entries['option'], response_position=entries['responseposition'], option_color=entries['optioncolor'])
+                try:
+                    db_session.add(o)
+                    db_session.commit()
+                except:
+                    db_session.rollback()
+                finally:
+                    db_session.close()
+            return redirect(url_for('show_questions'))
+
+        elif request.form['action'] == 'Delete':
+            try:
+                db_session.query(Option).filter_by(question_id=questionid).delete()
+                db_session.query(Question).filter_by(question_id=questionid).delete()
+                db_session.commit()
+            except:
+                print("Error deleting from kiosk_survey")
+                db_session.rollback()
+            finally:
+                db_session.close()
+            return redirect(url_for('show_questions'))
+
+    return render_template("edit_question_form.html", form=form, qid=questionid)
+
 @app.route('/survey/<int:surveyid>', methods=['GET'])
 @login_required
 def survey_page(surveyid):
@@ -294,6 +340,53 @@ def survey_page(surveyid):
     else:
         hasData = True
     return render_template("surveypage.html", survey=s, questions=q, deployments=d, hasData=hasData)
+
+@app.route('/editsurveyform/<int:surveyid>', methods=['GET', 'POST'])
+@login_required
+def edit_survey_form(surveyid):
+    survey=SurveyInfo.query.filter_by(survey_info_id=surveyid).one()
+    form=SurveyForm(request.form).new()
+    if request.method == 'GET':
+        form.surveyname.data = survey.survey_name
+        form.description.data = survey.description
+
+    if request.method == 'POST':
+        if request.form['action'] == 'Submit':
+            try:
+                db_session.query(SurveyInfo).filter_by(survey_info_id=surveyid).update({"survey_name": form.surveyname.data, "description": form.description.data})
+                db_session.query(SurveyQuestion).filter_by(survey_info_id=surveyid).delete()
+                db_session.commit()
+                survey_id=survey.survey_info_id
+            except:
+                print("Error inserting into kiosk_survey")
+                db_session.rollback()
+                raise
+            finally:
+                db_session.close()
+            for question_id in form.question.data:
+                q=SurveyQuestion(survey_id, question_id, 1)
+                try:
+                    db_session.add(q)
+                    db_session.commit()
+                except:
+                    db_session.rollback()
+                finally:
+                    db_session.close()
+            return redirect(url_for('show_surveys'))
+
+        elif request.form['action'] == 'Delete':
+            try:
+                db_session.query(SurveyQuestion).filter_by(survey_info_id=surveyid).delete()
+                db_session.query(SurveyInfo).filter_by(survey_info_id=surveyid).delete()
+                db_session.commit()
+            except:
+                print("Error deleting from kiosk_survey")
+                db_session.rollback()
+            finally:
+                db_session.close()
+            return redirect(url_for('show_surveys'))
+
+    return render_template("edit_survey_form.html", form=form, sid=surveyid)
 
 @app.route('/deployment/<int:deployedurlid>', methods=['GET'])
 @login_required
@@ -349,3 +442,28 @@ def create_user():
 def show_users():
     u=User.query.all()
     return render_template('show_users.html', users=u)
+
+''' This is disabled as we would like to keep this functionality through the use of database only
+@app.route('/edituserform/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_user_form(id):
+    user=User.query.filter_by(id=id).one()
+    form=UserForm(request.form).new()
+    if request.method == 'GET':
+        form.name.data = user.name
+        form.email.data = user.email
+
+    if request.method == 'POST':
+        if request.form['action'] == 'Submit':
+            try:
+                db_session.query(SurveyInfo).filter_by(survey_info_id=surveyid).update({"survey_name": form.surveyname.data, "description": form.description.data})
+                db_session.query(SurveyQuestion).filter_by(survey_info_id=surveyid).delete()
+                db_session.commit()
+                survey_id=survey.survey_info_id
+            except:
+                print("Error inserting into kiosk_survey")
+                db_session.rollback()
+                raise
+            finally:
+                db_session.close()
+    return render_template("edit_survey_form.html", form=form, id=id)'''
