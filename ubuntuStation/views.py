@@ -238,9 +238,16 @@ def edit_deployment_form(deploymentid):
 
     if request.method == 'POST':
         try:
-            db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"url_text": form.url_text.data, "is_kioski": form.is_kiosk.data, "building_id": form.building_id.data})
-            db_session.query(KioskSurvey).filter_by(deployed_url_id=deploymentid).update({"url": form.url_text.data, "survey_info_id": form.survey_id.data})
-            db_session.commit()
+            if request.form['action'] == 'Submit':
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"url_text": form.url_text.data, "is_kioski": form.is_kiosk.data, "building_id": form.building_id.data})
+                db_session.query(KioskSurvey).filter_by(deployed_url_id=deploymentid).update({"url": form.url_text.data, "survey_info_id": form.survey_id.data})
+                db_session.commit()
+            elif request.form['action'] == 'Disable':
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": 'f'})
+                db_session.commit()
+            elif request.form['action'] == 'Enable':
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": 't'})
+                db_session.commit()
         except:
             print("Error inserting into kiosk_survey")
             db_session.rollback()
@@ -286,11 +293,13 @@ def question_page(questionid):
 @login_required
 def edit_question_form(questionid):
     question=Question.query.filter_by(question_id=questionid).one()
+    option=Option.query.filter_by(question_id=questionid)
     form=QuestionForm(request.form).new()
     if request.method == 'GET':
         form.questiontext.data = question.question_text
         form.questiondescription.data = question.question_description
         form.questiontype.data = question.question_type
+        print(form.entries.data)
 
     if request.method == 'POST':
         if request.form['action'] == 'Submit':
@@ -314,7 +323,7 @@ def edit_question_form(questionid):
                     db_session.close()
             return redirect(url_for('show_questions'))
 
-        elif request.form['action'] == 'Delete':
+        if request.form['action'] == 'Delete':
             try:
                 db_session.query(Option).filter_by(question_id=questionid).delete()
                 db_session.query(Question).filter_by(question_id=questionid).delete()
@@ -401,19 +410,19 @@ def deployment_page(deployedurlid):
 @app.route('/showdeployments', methods=['GET'])
 @login_required
 def show_deployments():
-    d=DeployedURL.query.all()
+    d=DeployedURL.query.order_by(desc('is_deployed')).all()
     return render_template('show_deployments.html', deployments=d)
 
 @app.route('/showsurveys', methods=['GET'])
 @login_required
 def show_surveys():
-    s=SurveyInfo.query.all()
+    s=SurveyInfo.query.order_by('survey_info_id').all()
     return render_template('show_surveys.html', surveys=s)
 
 @app.route('/showquestions', methods=['GET'])
 @login_required
 def show_questions():
-    question=Question.query.all()
+    question=Question.query.order_by('question_id').all()
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
     entries=question
     return render_template('show_questions.html', questions=entries)

@@ -1,9 +1,17 @@
 $(function() {
     $("div[data-toggle=fieldset]").each(function() {
         var $this = $(this);
+        var csrf_token = "{{ csrf_token() }}";
 
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
         //Add new entry
-        $this.find("button[data-toggle=fieldset-add-row]").click(function() {
+        $this.find("button[data-toggle=fieldset-add-row]").on("click", function() {
             var target = $($(this).data("target"))
             console.log(target);
             var oldrow = target.find("[data-toggle=fieldset-entry]:last");

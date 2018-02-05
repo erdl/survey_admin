@@ -43,8 +43,13 @@
 	</div>
 
 	<a href="{{ url_for('deployment_page', deployedurlid=did) }}" class="btn btn-default">Cancel</a>
-	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
+	<button type ="submit" name="action" class="btn btn-primary" value="Submit">Submit</button>
+	{% if d.is_deployed == true %}
+		<button type ="submit" name="action" style="margin-right:150px;float:right" class="btn btn-danger" value="Disable">Disable this survey</button>
+	{% else %}
+		<button type ="submit" name="action" style="margin-right:150px;float:right" class="btn btn-success" value="Enable">Deploy this survey</button>
 	</fieldset>
+	{% endif %}
 </form>
 </div>
 </div>
