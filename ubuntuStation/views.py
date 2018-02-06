@@ -95,7 +95,6 @@ def callback():
                 #user.email = email
                 return redirect(url_for('login'))
             user.name = user_data['name']
-            print(token)
             user.tokens = json.dumps(token)
             db.session.add(user)
             db.session.commit()
@@ -299,7 +298,6 @@ def edit_question_form(questionid):
         form.questiontext.data = question.question_text
         form.questiondescription.data = question.question_description
         form.questiontype.data = question.question_type
-        print(form.entries.data)
 
     if request.method == 'POST':
         if request.form['action'] == 'Submit':
@@ -354,10 +352,12 @@ def survey_page(surveyid):
 @login_required
 def edit_survey_form(surveyid):
     survey=SurveyInfo.query.filter_by(survey_info_id=surveyid).one()
+    surveyq=Question.query.join(SurveyQuestion, Question.question_id == SurveyQuestion.question_id).filter_by(survey_info_id=surveyid).order_by(SurveyQuestion.question_position)
     form=SurveyForm(request.form).new()
     if request.method == 'GET':
         form.surveyname.data = survey.survey_name
         form.description.data = survey.description
+        form.question.data = [q.question_id for q in surveyq]
 
     if request.method == 'POST':
         if request.form['action'] == 'Submit':

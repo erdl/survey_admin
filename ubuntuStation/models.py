@@ -70,6 +70,9 @@ class SurveyQuestion(db.Model):
         self.question_id=question_id
         self.question_position=0
 
+    def __iter__(self):
+        return self.question_id
+
     def __repr__(self):
         return '<survey question id %r>' %(self.question_id)
 
