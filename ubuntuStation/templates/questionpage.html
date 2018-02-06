@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
+<head>
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
+<body>
+		<ul class="breadcrumb">
+			<li><a href="{{ url_for('home') }}">Home</a></li>
+			<li><a href="{{ url_for('show_questions') }}">Questions</a></li>
+			<li class="active">Question {{ question.url_text }}</li>
+		</ul>
 	<div class="container">
-		<h1>{{ question.question_description }}</h1>
+		<h1>{{ question.question_description }} <a href="{{ url_for('edit_question_form', questionid=question.question_id) }}" class="btn btn-warning"><i class="glyphicon glyphicon-edit"></i> Edit</a></h1>
 		<h3>Question Text</h3>
 		<p>{{ question.question_text }}</p>
 		<h3>Options</h3>

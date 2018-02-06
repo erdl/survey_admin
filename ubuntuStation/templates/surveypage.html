@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+<head>
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+</head>
 	<ul class="breadcrumb">
 		<li><a href="{{ url_for('home') }}">Home</a></li>
 		<li><a href="{{ url_for('show_surveys') }}">Surveys</a></li>
@@ -7,7 +11,7 @@
 	</ul>
 
 	<div class="container">
-		<h1>Survey: {{ survey.survey_name }}</h1>
+		<h1>Survey: {{ survey.survey_name }} {{ survey.url_text }} <a href="{{ url_for('edit_survey_form', surveyid=survey.survey_info_id) }}" class="btn btn-warning"><i class="glyphicon glyphicon-edit"></i> Edit</a></h1>
 
 		{% if survey.description %}	
 		<h2>Description</h2>

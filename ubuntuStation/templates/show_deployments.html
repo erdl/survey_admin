@@ -10,14 +10,19 @@
 		
 		<thead>
 			<tr>
-				<th>Deployment URL</th>
-				<th></th>
+				<th>Deployed Status</th>
+				<th style="margin-right:50px;float:left">Deployment URL</th>
 			</tr>
 		</thead>
 	{% for d in deployments %}
 		<tr>
+			{% if d.is_deployed == true %}
+				<td><a  class="btn btn-success btn-sm">Active</a></td>
+			{% else %}
+				<td><a  class="btn btn-danger btn-sm">Inactive</a></td>
+			{% endif %}
 			<td><a href="{{ url_for('deployment_page', deployedurlid=d.deployed_url_id) }}">{{ d.url_text }}</a></td>
-		<td><a href="{{ url_for('edit_deployment_form', deploymentid=d.deployed_url_id) }}" class="btn btn-warning btn-sm">Edit</a></td>
+			<td><a href="{{ url_for('edit_deployment_form', deploymentid=d.deployed_url_id) }}" class="btn btn-warning btn-sm">Edit</a></td>
 		</tr>
 	{% endfor %}
 	</table>
