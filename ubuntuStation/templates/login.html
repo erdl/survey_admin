@@ -1,22 +1,11 @@
+
 {% extends "base.html" %}
 {% block content %}
 <div class="well">
-{% from "_formhelpers.html" import render_field %}
-{{ form.csrf_token }}
 <h1>Log In</h1>
 <p class="text-danger">You must log in to see this page.</p>
 <div class="container">
-<form action="/login" method="post" name="login_form">
-	{{ form.hidden_tag() }}
-	<div class="form-group">
-		{{ render_field(form.username) }}
-	</div>
-	<div class="form-group">
-		{{ render_field(form.password) }}
-	</div>
-	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
-	</fieldset>
-</form>
+<a href="{{auth_url}}" class="btn";"><img src="static/google_login.png" width="335.2" height="68.8"></a>
 </div>
 </div>
 {% endblock %}
