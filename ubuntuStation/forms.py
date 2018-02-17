@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from .models import *
-from wtforms import SelectField, StringField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField
+from wtforms import SelectField, IntegerField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField, FieldList, FormField
 from wtforms.validators import DataRequired, ValidationError
 
 class UniqueValidator(object):
@@ -25,11 +25,23 @@ class UniqueValidator(object):
             #print("Error")
             raise ValidationError('Entry with this value already exists in the database')
 
-'''
+
+class QuestionEntryForm(FlaskForm):
+    option=SelectField('option',validators=[DataRequired()],choices=[(o.text, o.text) for o in Option.query.distinct('text').order_by('text', 'option_id')])
+    responseposition=IntegerField('responseposition',validators=[DataRequired()])
+    optioncolor=TextField('optioncolor', validators=[DataRequired()], description=u'Option Color')
+
 class QuestionForm(FlaskForm):
-    questiontext = TextAreaField('questiontext', validators=[DataRequired()], description=u'Question')
-    questionurl = TextField('questionurl', validators=[DataRequired()], description=u'Question URL')
-'''
+    questiontext = TextField('questiontext', validators=[DataRequired()], description=u'Question Text')
+    questiondescription = TextField('questiondescription', validators=[DataRequired()], description=u'Description')
+    questiontype = TextField('questiontype', validators=[DataRequired()], description=u'Type')
+    entries=FieldList(FormField(QuestionEntryForm), min_entries=1)
+
+    @classmethod
+    def new(cls):
+        form=cls()
+        return form
+
 '''
 class ActiveQuestionForm(FlaskForm):
     urls=ActiveQuestion.query.with_entities(ActiveQuestion.activequestionurl)
@@ -56,7 +68,7 @@ class DeploymentForm(FlaskForm):
     is_kiosk=RadioField('is_kiosk', choices=[('1', "Yes - Shows only one question and reloads the same question after it is answered."), ('0', "No - Shows multiple questions on the same page and does not reload the questions after the form is submitted.")], description=u'Will this URL be deployed on a kiosk?')
     building_id=SelectField('building_id', description=u'Which building will this kiosk be located in?', coerce=int, choices=[(b.building_id, b.name) for b in Building.query.order_by('name')])
     survey_id=SelectField('survey_id', description=u'Which survey should be shown on this kiosk?', coerce=int, choices=[(s.survey_info_id, s.survey_name) for s in SurveyInfo.query.order_by("survey_name")])
-    
+
     @classmethod
     def new(cls):
         form=cls()
@@ -72,8 +84,7 @@ class EditDeploymentForm(FlaskForm):
         form=cls()
         form.survey_id.choices=[(s.survey_info_id, s.survey_name) for s in SurveyInfo.query.order_by("survey_name")]
         return form
-        
+
 class LoginForm(FlaskForm):
     username=TextField('username', description=u'Username', validators=[DataRequired()])
     password=PasswordField('password', description=u'Password', validators=[DataRequired()])
-
