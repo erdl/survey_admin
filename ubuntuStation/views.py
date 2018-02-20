@@ -290,10 +290,10 @@ def show_questions():
     entries=question
     return render_template('show_questions.html', questions=entries)
 
-@app.route('/createuser', methods=['GET', 'POST'])
+@app.route('/create_oauth_user', methods=['GET', 'POST'])
 @login_required
-def create_user():
-    form=UserForm(request.form).new()
+def create_oauth_user():
+    form=CreateOauthUserForm(request.form).new()
     if request.method == 'POST' and form.validate():
         user=User(name=form.name.data, email=form.email.data)
         try:
