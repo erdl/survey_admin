@@ -10,6 +10,9 @@ import urllib.parse as urlparse
 from .forms import *
 from .models import *
 from .database import db_session
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect(app)
 
 '''
 @login_manager.request_loader
