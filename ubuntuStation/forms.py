@@ -77,7 +77,7 @@ class LoginForm(FlaskForm):
     username=TextField('username', description=u'Username', validators=[DataRequired()])
     password=PasswordField('password', description=u'Password', validators=[DataRequired()])
 
-class UserForm(FlaskForm):
+class CreateOauthUserForm(FlaskForm):
     name=TextField('name', description=u'Name', validators=[DataRequired(), UniqueValidator(User, User.name)])
     email=TextField('email', description=u'Email', validators=[DataRequired(), UniqueValidator(User, User.email)])
 
