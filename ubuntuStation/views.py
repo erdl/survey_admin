@@ -299,3 +299,28 @@ def show_questions():
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
     entries=question
     return render_template('show_questions.html', questions=entries)
+
+@app.route('/create_oauth_user', methods=['GET', 'POST'])
+@login_required
+def create_oauth_user():
+    form=CreateOauthUserForm(request.form).new()
+    if request.method == 'POST' and form.validate():
+        user=User(name=form.name.data, email=form.email.data)
+        try:
+            db_session.add(user)
+            db_session.commit()
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
+        return redirect(url_for('show_users'))
+    else:
+        print(form.errors)
+    return render_template('create_oauth_user.html', form=form)
+
+@app.route('/showusers', methods=['GET'])
+@login_required
+def show_users():
+    u=User.query.all()
+    return render_template('show_users.html', users=u)
