@@ -1,6 +1,5 @@
 # Special files that should not be sent to Github
 config.json
-ubuntuStation/database.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
