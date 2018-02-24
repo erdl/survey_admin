@@ -5,9 +5,11 @@ from flask_login import login_required, login_user, logout_user, current_user
 import json
 from .forms import *
 from .models import *
-from .database import db_session
+from .database import db_session, data
 from requests_oauthlib import OAuth2Session
-from .database import data
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect(app)
 
 class Auth:
     CLIENT_ID = data["CLIENT_ID"]
@@ -102,19 +104,38 @@ def callback():
 def logout():
     logout_user()
     return redirect(url_for('login'))
-'''
-disabled functionality to add question to the database (see github.com/erdl/survey_admin/ issue #2)
+
 @app.route('/questionform', methods=['GET', 'POST'])
 @login_required
-def questionform():
-    form = QuestionForm(request.form)
-    if request.method == 'POST':
-        question=Question(form.questiontext.data)
-        db_session.add(question)
-        db_session.commit()
+def question_form():
+    form = QuestionForm(request.form).new()
+    if request.method == 'POST' and form.validate():
+        question=Question(question_text=form.questiontext.data, \
+            question_description=form.questiondescription.data, question_type=form.questiontype.data)
+        try:
+            db_session.add(question)
+            db_session.commit()
+            question_id=question.question_id
+        except:
+            db_session.rollback()
+            raise
+        finally:
+            db_session.close()
+        print(form.entries.data)
+        for entries in form.entries.data:
+            print(entries)
+            o=Option(question_id=question_id, text=entries['option'], response_position=entries['responseposition'], option_color=entries['optioncolor'])
+            try:
+                db_session.add(o)
+                db_session.commit()
+            except:
+                db_session.rollback()
+            finally:
+                db_session.close()
         return redirect(url_for('show_questions'))
+    else:
+        print(form.errors)
     return render_template('question_form.html', form=form)
-'''
 
 @app.route('/surveyform', methods=['GET', 'POST'])
 @login_required

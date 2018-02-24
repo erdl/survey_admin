@@ -26,6 +26,7 @@ class Option(db.Model):
     value=db.Column(db.String(45), nullable=False)
     question_id=db.Column(db.Integer, db.ForeignKey('question.question_id'), nullable=False)
     response_position=db.Column(db.Integer, nullable=False)
+    option_color=db.Column(db.String(7), nullable=False)
 
     def __repr__(self):
         return '<option_text %r>' % (self.text)
