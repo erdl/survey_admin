@@ -8,6 +8,7 @@ from .models import *
 from .database import db_session, data
 from requests_oauthlib import OAuth2Session
 from flask_wtf.csrf import CSRFProtect
+from urllib.error import HTTPError
 
 csrf = CSRFProtect(app)
 
