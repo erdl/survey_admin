@@ -9,6 +9,7 @@ from .database import db_session, data
 from requests_oauthlib import OAuth2Session
 from flask_wtf.csrf import CSRFProtect
 from urllib.error import HTTPError
+import sys
 
 csrf = CSRFProtect(app)
 
@@ -248,13 +249,14 @@ def edit_deployment_form(deploymentid):
                     {"survey_info_id": form.survey_id.data})
                 db_session.commit()
             elif request.form['action'] == 'Disable':
-                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": 'f'})
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": False})
                 db_session.commit()
             elif request.form['action'] == 'Enable':
-                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": 't'})
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": True})
                 db_session.commit()
         except:
             print("Error inserting into kiosk_survey")
+            print(sys.exc_info())
             db_session.rollback()
         finally:
             db_session.close()
