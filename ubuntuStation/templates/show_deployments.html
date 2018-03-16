@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="static/show_deployments.css">
+{% endblock %}
 {% block content %}
 	<ul class="breadcrumb">
 		<li><a href="{{ url_for('home') }}">Home</a></li>
@@ -10,14 +14,20 @@
 		
 		<thead>
 			<tr>
+				<th>Deployment Status</th>
 				<th>Deployment URL</th>
-				<th></th>
 			</tr>
 		</thead>
 	{% for d in deployments %}
-		<tr>
+		<tr id="deployment-info-row">
+			{% if d.is_deployed %}
+				<td class="deployment-status-column"><span class="label label-success">Active</span></td>
+			{% else %}
+				<td class="deployment-status-column"><span class="label label-default">Inactive</span></td>
+			{% endif %}
+
 			<td><a href="{{ url_for('deployment_page', deployedurlid=d.deployed_url_id) }}">{{ d.url_text }}</a></td>
-		<td><a href="{{ url_for('edit_deployment_form', deploymentid=d.deployed_url_id) }}" class="btn btn-warning btn-sm">Edit</a></td>
+		    <td><a href="{{ url_for('edit_deployment_form', deploymentid=d.deployed_url_id) }}" class="btn btn-warning btn-sm">Edit</a></td>
 		</tr>
 	{% endfor %}
 	</table>
