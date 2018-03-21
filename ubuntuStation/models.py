@@ -78,7 +78,7 @@ class DeployedURL(db.Model):
     deployed_url_id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     url_text=db.Column(db.String(255))
     is_kioski=db.Column(db.Boolean)
-    is_deployed = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=False)
     building_id=db.Column(db.Integer, db.ForeignKey('building.building_id'))
 
     def __init__(self, url, kiosk, building):

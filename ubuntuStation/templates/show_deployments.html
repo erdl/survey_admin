@@ -20,7 +20,7 @@
 		</thead>
 	{% for d in deployments %}
 		<tr id="deployment-info-row">
-			{% if d.is_deployed %}
+			{% if d.is_active %}
 				<td class="deployment-status-column"><span class="label label-success">Active</span></td>
 			{% else %}
 				<td class="deployment-status-column"><span class="label label-default">Inactive</span></td>

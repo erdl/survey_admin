@@ -16,7 +16,7 @@
 		    <span class="text-muted">{{ building.name }}</span>
 		</p>
         <p>Status
-        {% if deployment.is_deployed == true %}
+        {% if deployment.is_active == true %}
             <span class="text-success"> active </span>
         {% else %}
             <span class="text-muted"> inactive </span>

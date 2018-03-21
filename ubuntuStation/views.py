@@ -249,10 +249,10 @@ def edit_deployment_form(deploymentid):
                     {"survey_info_id": form.survey_id.data})
                 db_session.commit()
             elif request.form['action'] == 'Disable':
-                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": False})
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_active": False})
                 db_session.commit()
             elif request.form['action'] == 'Enable':
-                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_deployed": True})
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_active": True})
                 db_session.commit()
         except:
             print("Error inserting into kiosk_survey")
@@ -302,7 +302,7 @@ def deployment_page(deployedurlid):
 @app.route('/showdeployments', methods=['GET'])
 @login_required
 def show_deployments():
-    d = DeployedURL.query.order_by(desc('is_deployed')).all()
+    d = DeployedURL.query.order_by(desc('is_active')).all()
     return render_template('show_deployments.html', deployments=d)
 
 @app.route('/showsurveys', methods=['GET'])
