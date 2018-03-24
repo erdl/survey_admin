@@ -1,6 +1,6 @@
 from . import db
 from flask_login import UserMixin
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint, desc
 
 class User(db.Model, UserMixin):
     __tablename__ = "oauth"
@@ -77,7 +77,8 @@ class DeployedURL(db.Model):
     __tablename__="deployed_url"
     deployed_url_id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     url_text=db.Column(db.String(255))
-    is_kioski=db.Column(db.String(45))
+    is_kioski=db.Column(db.Boolean)
+    is_deployed = db.Column(db.Boolean, default=False)
     building_id=db.Column(db.Integer, db.ForeignKey('building.building_id'))
 
     def __init__(self, url, kiosk, building):
