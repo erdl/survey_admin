@@ -2,9 +2,9 @@
 <html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/bootstrap.css') }}">
 	<!--<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">-->
-	<script type="text/javascript" src="{{ url_for('static', filename='admin_dashboard.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='scripts/admin_dashboard.js') }}"></script>
 </head>
 <body>
 	<nav class="navbar navbar-default">
@@ -14,7 +14,7 @@
 			</div>
 		</div>
 	</nav>
-	<!--<script type="text/javascript" src="{{ url_for('static', filename='admin_dashboard.js') }}"></script>-->
+	<!--<script type="text/javascript" src="{{ url_for('static', filename='scripts/admin_dashboard.js') }}"></script>-->
 	<div class="container" style="padding-top: 15px">
 	<div class="well">
 	<form id="questionForm" name="questionForm" action="/admin-dashboard" method="POST" class="form-horizontal" onSubmit="validateForm()">
