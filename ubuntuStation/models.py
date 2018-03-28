@@ -77,17 +77,17 @@ class DeployedURL(db.Model):
     __tablename__="deployed_url"
     deployed_url_id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     url_text=db.Column(db.String(255))
-    is_kioski=db.Column(db.Boolean)
+    is_kiosk=db.Column(db.Boolean)
     is_active = db.Column(db.Boolean, default=False)
     building_id=db.Column(db.Integer, db.ForeignKey('building.building_id'))
 
     def __init__(self, url, kiosk, building):
         self.url_text = url
-        self.is_kioski = kiosk
+        self.is_kiosk = kiosk
         self.building_id = building
 
     def __repr__(self):
-        return '<deployment url id %r %r %r>' %(self.url_text, self.is_kioski, self.building_id)
+        return '<deployment url id %r %r %r>' %(self.url_text, self.is_kiosk, self.building_id)
 
 class Building(db.Model):
     __tablename__="building"

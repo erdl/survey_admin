@@ -238,7 +238,7 @@ def edit_deployment_form(deploymentid):
     if request.method == 'GET':
         form.url_text.data = deployment.url_text
         form.building_id.data = building.building_id
-        form.is_kiosk.data = deployment.is_kioski
+        form.is_kiosk.data = deployment.is_kiosk
         form.survey_id.data = kiosksurvey.survey_info_id
         return render_template("edit_deployment_form.html", form=form, ks=kiosksurvey, d=deployment, did=deploymentid, b=building)
 
