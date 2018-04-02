@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="container">
+		<h1>{{ question.question_description }}</h1>
+		<h3>Question Text</h3>
+		<p>{{ question.question_text }}</p>
+		<h3>Options</h3>
+			<ul>	
+				{% for o in option %}
+				<li>{{ o.text }}</li>
+				{% endfor %}
+			</ul>
+	</div>
+{% endblock %}

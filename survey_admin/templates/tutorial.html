@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid" style="border-right:200px solid #ffffff; border-left:200px solid #ffffff;">
+	<h1>Overview</h1>
+	<p>This dashboard provides an interface for managing the kiosk database. Users can group questions together to form a survey, and deploy these surveys to a URL. The URL will be on display on a kiosk in a given building.</p>
+	<p>There are three main components of this dashboard:
+	<ul>
+		<li><b>Questions:</b> Questions are linked to options. These questions are what will be shown on the kiosk.</li>
+		<li><b>Surveys:</b> Surveys are a group of questions.</li>
+		<li><b>Deployments:</b> Deployments link a URL to a survey. They also contain data regarding what building the given URL will be deployed in.
+	</ul>
+	</p>
+	<h1>Add a Question</h1>
+	<p>Please contact the <a href="mailto:epeppard@hawaii.edu">database administrator</a> to add a question.</p>
+	<h1>Add a Survey</h1>
+	<p>Add multiple questions to a survey by hitting the <button class="btn btn-default btn-xs disabled">ctrl</button> button and clicking on the questions you'd like on the survey. Once surveys are added, you cannot edit them.</p> 
+	<h1>Manage Deployments</h1>
+	<p>You can add a deployment which links a URL to a survey. Only one survey may be added to a deployment at a given time. You may add a different survey to a given deployment by editing a deployment.</p>
+	<p><b>When should I add a deployment and when should I edit a deployment?</b> For every device, there will be a unique URL. So, <i>add</i> a deployment when you have a new device. <i>Edit</i> a deployment when you already have a device with a URL but would like to show a different survey on it.</p>
+
+</div>
+{% endblock %}

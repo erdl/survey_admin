@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="container" style="padding-top: 15px">
+	<div class="jumbotron">
+		<h1>FROG Building Survey Dashboard</h1>
+		<p>This is the administrator dashboard for the survey station in the FROG buildings. Administrators can view questions and add and manage deployments. Please consult with database manager to add questions and view responses.</p>
+		<a href="{{ url_for('tutorial') }}"><button type="button" class="btn btn-success btn-lg" data-toggle="tooltip" data-placement="bottom" title="Learn how to use this dashboard">Get Started</button></a>
+	</div>
+	<script>
+		$(function () {
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+	</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="well">
+{% from "_formhelpers.html" import render_field %}
+{{ form.csrf_token }}
+<h1>Create Deployment</h1>
+<p class="text-muted">Create a new deployment.</p>
+<div class="container">
+<form action="/deploymentform" method="post" name="deployment_form">
+	{{ form.hidden_tag() }}
+	<div class="form-group">
+		{% if 'url_text' in form %}
+			{{ render_field(form.url_text) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">URL</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
+	</div>
+	<div class="form-group">
+		{% if 'building_id' in form %}	
+			{{ render_field(form.building_id) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">Building ID</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
+	</div>
+	<div class="form-group">
+		{% if 'is_kiosk' in form %}
+			{{ render_field(form.is_kiosk) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">Kiosk View</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
+	</div>
+	<div class="form-group">
+		{% if 'survey_id' in form %}
+			{{ render_field(form.survey_id) }}
+		{% else %}
+		  	<label class="control-label" for="disabledInput">Survey Name</label>
+			<input class="form-control" id="disabledInput" type="text" placeholder="Hello" disabled="">
+		{% endif %}
+	</div>
+	<a href="{{ url_for('show_deployments') }}" class="btn btn-default">Cancel</a>
+	<button type=submit class="btn btn-primary" value=Submit>Submit</button>
+	</fieldset>
+</form>
+</div>
+</div>
+{% endblock %}

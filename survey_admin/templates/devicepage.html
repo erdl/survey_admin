@@ -1,0 +1,22 @@
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/bootstrap.css') }}">
+</head>
+<body
+	<div class="container">
+		<h1>Device</h1>
+		<p>{{ question.activequestionurl }}</p>
+		<h1>Question URL</h1>
+		<p>\{{ question.activequestionurl }}</p>
+		<h1>Active Question Text</h1>
+		<p>{{ questiontext }}</p>
+	</div>
+	<div class="well">
+	{% from "_formhelpers.html" import render_field %}
+	<form action="{{ url_for('device_page', activequestionid=question.activequestionid) }}" method="post" name="active_question_form">
+		<div class="form-group">
+			{{ render_field(form.activequestionurl) }}
+		</div>
+		<button type=submit class="btn btn-primary" value=Submit>Submit</button>
+	</form>
+	</div>
+</body>
