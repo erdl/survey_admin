@@ -182,8 +182,7 @@ legend {
   padding: 0;
 }
 textarea {
-  height: 120px;
-  width: 420px:
+  overflow: auto;
 }
 optgroup {
   font-weight: bold;
