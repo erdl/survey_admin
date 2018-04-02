@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from ubuntuStation import app, db
+from survey_admin import app, db
 import os
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
