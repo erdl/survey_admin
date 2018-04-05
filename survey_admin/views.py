@@ -176,22 +176,16 @@ def deployment_form():
         deployment=DeployedURL(form.url_text.data, form.is_kiosk.data, form.building_id.data)
         try:
             db_session.add(deployment)
-            #print(deployment)
+            db_session.flush()
+
+            ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)
+            db_session.add(ks)
             db_session.commit()
         except:
             db_session.rollback()
             raise
         finally:
-            #print(deployment.deployed_url_id)
-            ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)
-            try:
-                db_session.add(ks)
-                db_session.commit()
-            except:
-                db_session.rollback()
-                raise
-            finally:
-                db_session.close()
+            db_session.close()
         return redirect(url_for('show_deployments'))
     else:
         print(form.errors)
