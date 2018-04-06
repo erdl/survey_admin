@@ -1,0 +1,4 @@
+/* Vertically center the 'deployment status' label */
+#deployment-info-row .deployment-status-column {
+     vertical-align: middle;
+}

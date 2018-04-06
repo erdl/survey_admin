@@ -9,6 +9,7 @@ from .database import db_session, data
 from requests_oauthlib import OAuth2Session
 from flask_wtf.csrf import CSRFProtect
 from urllib.error import HTTPError
+import sys
 
 csrf = CSRFProtect(app)
 
@@ -224,47 +225,43 @@ def deployment_form():
 @app.route('/editdeploymentform/<int:deploymentid>', methods=['GET', 'POST'])
 @login_required
 def edit_deployment_form(deploymentid):
+    """Route used to display the edit_deployment_form.html page
+
+    GET: renders the edit_deployment_form page for the given deployment_id
+    POST: submits desired changes to the database, then redirects user to show_deployments
+    """
     deployment=DeployedURL.query.filter_by(deployed_url_id=deploymentid).one()
     building=Building.query.filter_by(building_id=deployment.building_id).one()
     kiosksurvey=KioskSurvey.query.filter_by(deployed_url_id=deploymentid).one()
     form=DeploymentForm(request.form).new()
-    del form.url_text
-    del form.is_kiosk
-    del form.building_id
+
+    if request.method == 'GET':
+        form.url_text.data = deployment.url_text
+        form.building_id.data = building.building_id
+        form.is_kiosk.data = deployment.is_kioski
+        form.survey_id.data = kiosksurvey.survey_info_id
+        return render_template("edit_deployment_form.html", form=form, ks=kiosksurvey, d=deployment, did=deploymentid, b=building)
+
     if request.method == 'POST':
-        #kiosksurvey.survey_info_id=form.survey_id.data
-        #TODO: debug this, kiosk_survey table isn't getting updated
         try:
-            db_session.query(KioskSurvey).filter_by(deployed_url_id=deploymentid).update({"survey_info_id": form.survey_id.data})
-            #print(kiosksurvey.survey_info_id)
-            db_session.commit()
+            if request.form['action'] == 'Submit':
+                db_session.query(KioskSurvey).filter_by(deployed_url_id=deploymentid).update(
+                    {"survey_info_id": form.survey_id.data})
+                db_session.commit()
+            elif request.form['action'] == 'Disable':
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_active": False})
+                db_session.commit()
+            elif request.form['action'] == 'Enable':
+                db_session.query(DeployedURL).filter_by(deployed_url_id=deploymentid).update({"is_active": True})
+                db_session.commit()
         except:
             print("Error inserting into kiosk_survey")
+            print(sys.exc_info())
             db_session.rollback()
         finally:
             db_session.close()
+
         return redirect(url_for('show_deployments'))
-    return render_template("edit_deployment_form.html", form=form, ks=kiosksurvey, d=deployment, did=deploymentid, b=building)
-    '''
-    deployment=DeployedURL.query.filter_by(deployed_url_id=deploymentid).one()
-    kiosksurvey=KioskSurvey.query.filter_by(deployed_url_id=deploymentid).one()
-    form=DeploymentForm(request.form)
-    opt_param = request.args.get("deploymentid")
-    print(opt_param)
-    del form.url_text
-    del form.is_kiosk
-    del form.building_id
-    if request.method == 'POST':
-        kiosksurvey.deployed_url_id=form.survey_id.data
-        try:
-            db_session.commit()
-        except:
-            db_session.rollback()
-            raise
-        finally:
-            db_session.close()
-    return render_template('deployment_form.html', form=form, ks=kiosksurvey, d=deployment)
-'''
 
 @app.route('/question/<int:questionid>', methods=['GET', 'POST'])
 @login_required
@@ -305,7 +302,7 @@ def deployment_page(deployedurlid):
 @app.route('/showdeployments', methods=['GET'])
 @login_required
 def show_deployments():
-    d=DeployedURL.query.all()
+    d = DeployedURL.query.order_by(desc('is_active')).all()
     return render_template('show_deployments.html', deployments=d)
 
 @app.route('/showsurveys', methods=['GET'])
