@@ -182,8 +182,7 @@ legend {
   padding: 0;
 }
 textarea {
-  height: 120px;
-  width: 420px:
+  overflow: auto;
 }
 optgroup {
   font-weight: bold;
@@ -2536,8 +2535,7 @@ input[type="range"] {
 }
 select[multiple],
 select[size] {
-  height: 450px;
-  width: 300px;
+  height: auto;
 }
 input[type="file"]:focus,
 input[type="radio"]:focus,

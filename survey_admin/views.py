@@ -1,4 +1,4 @@
-from ubuntuStation import app
+from survey_admin import app
 from flask import redirect, url_for, session, request, render_template
 from . import login_manager
 from flask_login import login_required, login_user, logout_user, current_user
@@ -176,22 +176,16 @@ def deployment_form():
         deployment=DeployedURL(form.url_text.data, form.is_kiosk.data, form.building_id.data)
         try:
             db_session.add(deployment)
-            #print(deployment)
+            db_session.flush()
+
+            ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)
+            db_session.add(ks)
             db_session.commit()
         except:
             db_session.rollback()
             raise
         finally:
-            #print(deployment.deployed_url_id)
-            ks=KioskSurvey(form.url_text.data, form.survey_id.data, deployment.deployed_url_id)
-            try:
-                db_session.add(ks)
-                db_session.commit()
-            except:
-                db_session.rollback()
-                raise
-            finally:
-                db_session.close()
+            db_session.close()
         return redirect(url_for('show_deployments'))
     else:
         print(form.errors)
@@ -238,7 +232,7 @@ def edit_deployment_form(deploymentid):
     if request.method == 'GET':
         form.url_text.data = deployment.url_text
         form.building_id.data = building.building_id
-        form.is_kiosk.data = deployment.is_kioski
+        form.is_kiosk.data = deployment.is_kiosk
         form.survey_id.data = kiosksurvey.survey_info_id
         return render_template("edit_deployment_form.html", form=form, ks=kiosksurvey, d=deployment, did=deploymentid, b=building)
 

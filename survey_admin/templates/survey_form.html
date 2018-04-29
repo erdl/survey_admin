@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="static/scripts/survey_form.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/stylesheets/survey_form.css">
+{% endblock %}
 {% block content %}
 <div class="well">
 {% from "_formhelpers.html" import render_field %}
 {{ form.csrf_token }}
-<script src="{{ url_for('static', filename='jquery.sortable.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/jquery.sortable.js') }}"></script>
 <h1>Create Survey</h1>
 <p class="text-muted">Use this form to add a survey with information and link questions to a survey</p>
 <div class="container">
