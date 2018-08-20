@@ -257,6 +257,52 @@ def edit_deployment_form(deploymentid):
 
         return redirect(url_for('show_deployments'))
 
+@app.route('/editsurveyform/<int:survey_info_id>', methods=['GET', 'POST'])
+@login_required
+def edit_survey_form(survey_info_id):
+    """Route used to display the edit_survey_form.html page
+
+    GET: renders the edit_survey_form page for the given survey_info_id
+    POST: submits desired changes to the database, then redirects user to show_surveys
+    """
+
+    form = EditSurveyForm()
+    form.survey_questions.choices = [(q.question_id, "(" + str(q.question_id) + ") " + q.question_text) for q in Question.query.order_by("question_id")]
+    currently_selected_questions = [q.question_id for q in SurveyQuestion.query.filter_by(survey_info_id=survey_info_id)]
+
+    if request.method == 'GET':
+        return render_template('edit_survey_form.html', form=form, survey_info_id=survey_info_id, currently_selected_questions=",".join(map(str, currently_selected_questions)))
+    elif request.method == 'POST':
+
+        if form.validate_on_submit():
+            newly_selected_questions = []
+
+            for question in form.survey_questions:
+                if question.checked:
+                    newly_selected_questions.append(question.data)
+
+            # delete the old
+            print("Remove previously selected questions with id: " + ', '.join(map(str, currently_selected_questions)))
+            db_session.query(SurveyQuestion).filter(SurveyQuestion.survey_info_id==survey_info_id).delete()
+
+            # insert the new
+            for question_id in newly_selected_questions:
+                db_session.add(SurveyQuestion(survey_info_id, question_id, 0))
+
+            db_session.commit()
+
+            print("previous questions in this survey")
+            print(currently_selected_questions)
+
+            print("newly selected questions in this survey")
+            print(newly_selected_questions)
+
+            return redirect(url_for('show_surveys'))
+        else:
+            return render_template('edit_survey_form.html', form=form, survey_info_id=survey_info_id,
+                                   currently_selected_questions=",".join(map(str, currently_selected_questions)))
+
+
 @app.route('/question/<int:questionid>', methods=['GET', 'POST'])
 @login_required
 def question_page(questionid):
@@ -308,7 +354,7 @@ def show_surveys():
 @app.route('/showquestions', methods=['GET'])
 @login_required
 def show_questions():
-    question=Question.query.all()
+    question=Question.query.order_by('question_id').all()
     #entries=[dict(questiontext=q.questiontext, questionurl=q.questionurl) for q in question]
     entries=question
     return render_template('show_questions.html', questions=entries)
