@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from .models import *
-from wtforms import SelectField, IntegerField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField, FieldList, FormField
+from wtforms import SelectField, IntegerField, BooleanField, RadioField, TextField, TextAreaField, SelectMultipleField, PasswordField, FieldList, FormField, widgets
 from wtforms.validators import DataRequired, ValidationError
 
 class UniqueValidator(object):
@@ -88,3 +88,29 @@ class EditDeploymentForm(FlaskForm):
 class LoginForm(FlaskForm):
     username=TextField('username', description=u'Username', validators=[DataRequired()])
     password=PasswordField('password', description=u'Password', validators=[DataRequired()])
+
+class MultiCheckboxField(SelectMultipleField):
+    """
+    A multiple-select, except displays a list of checkboxes.
+
+    Iterating the field will produce subfields, allowing custom rendering of
+    the enclosed checkbox fields.
+    """
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
+class EditSurveyForm(FlaskForm):
+    survey_questions = MultiCheckboxField()
+
+    # check to make sure that at least one question has been selected for the survey
+    # this is a custom validation that gets called when we call form.validate_on_submit()
+    def validate(self):
+        is_correctly_filled = bool(len([question.data for question in self.survey_questions if question.checked]))
+
+        if is_correctly_filled:
+            return True
+        else:
+            self.errors['survey_questions'] = 'At least one question must be selected for a survey'
+            return False
+
+
