@@ -3,7 +3,7 @@
 	<div class="container">
 		<h1>{{ question.question_description }}</h1>
 		<h3>Question Text</h3>
-		<p>{{ question.question_text }}</p>
+		<p>{{ question.question_text | safe }}</p>
 		<h3>Options</h3>
 			<ul>	
 				{% for o in option %}
