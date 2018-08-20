@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/stylesheets/edit_survey_form.css">
+{% endblock %}
+
+{% block content %}
+<div class="well">
+
+    <h1>Edit Survey</h1>
+    <div class="container" id="form-description-box">
+        <p class="text-muted">Use this form to edit an existing survey.</p>
+        <p class="text-dark">
+            <a class="text-danger">Red questions</a> denote survey questions that are already set for this survey. Altering
+            an existing survey should be done with caution as this affects the surveys results when viewed over a period of time.
+            Once a survey is deployed and we are receiving data from that survey, the questions it contains should not be changed.
+        </p>
+    </div>
+
+    <div class="container">
+        <form action="{{ url_for('edit_survey_form', survey_info_id=survey_info_id) }}" method='POST' name='edit_survey_form'>
+            {{ form.csrf_token }}
+            <div class="form-group" id="check-questions-field">
+                {{ form.survey_questions }}
+            </div>
+
+            <button type="submit" name="action" class="btn btn-primary" value="Submit">Submit</button>
+        </form>
+        <p class="text-danger">{{ form.errors['survey_questions'] }}</p>
+    </div>
+
+
+</div>
+
+<script>
+    // whatever questions are currently selected are checked and colored red so that
+    // the user knows what was previously used instead of just having a blank form
+    var currently_selected_questions = '{{ currently_selected_questions }}'.split(',');
+    console.log(currently_selected_questions);
+
+    $('#survey_questions > li').each(function(i) {
+        var input = $('#survey_questions-' + i);
+        var label = $('label[for=survey_questions-' + i);
+        if (currently_selected_questions.includes(input.attr('value'))) {
+            input.attr('checked', 'true');
+            label.css('color', 'red');
+        }
+    });
+</script>
+
+{% endblock %}
