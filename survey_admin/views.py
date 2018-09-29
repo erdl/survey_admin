@@ -88,17 +88,18 @@ def callback():
             user_data = resp.json()
             email = user_data['email']
             user = User.query.filter_by(email=email).first()
+
             if user is None:
-                #user = User()
-                #user.email = email
+                # the user does not exist in our database, therefore someone tried to login
+                # that hasn't been authorized to do so. redirect them to the 'login' page..
                 return redirect(url_for('login'))
-            user.name = user_data['name']
-            print(token)
+
             user.tokens = json.dumps(token)
             db.session.add(user)
             db.session.commit()
             login_user(user)
             return redirect(url_for('home'))
+
         return 'Could not fetch your information.'
 
 @app.route('/logout')
