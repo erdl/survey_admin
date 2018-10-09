@@ -18,7 +18,7 @@
 	{% for question in questions %}
 		<tr>
 			<td><a href="{{ url_for('question_page', questionid=question.question_id) }}">{{ question.question_description }}</a></td>
-			<td>{{ question.question_text }}</td>
+			<td>{{ question.question_id }} {{ question.question_text | safe }}</td>
 		</tr>
 	{% endfor %}
 	</table>

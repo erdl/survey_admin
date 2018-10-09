@@ -17,7 +17,7 @@
 		<h1>Questions</h1>
 			<ul>
 				{% for question in questions %}
-				<li><a href={{ url_for('question_page', questionid = question.question_id) }}>{{ question.question_description }}</a><p class="text-muted">{{ question.question_text }}</p></li>
+				<li><a href={{ url_for('question_page', questionid = question.question_id) }}>{{ question.question_description }}</a><p class="text-muted">{{ question.question_text | safe }}</p></li>
 				{% endfor %}	
 			</ul>
 		<h1>Active On These URLs</h1>
